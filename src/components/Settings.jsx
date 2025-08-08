@@ -1,0 +1,127 @@
+import { div } from 'framer-motion/client';
+import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
+import GameSettings from './setting/GameSettings';
+
+const Settings = ({
+  onClose,
+  playerNames,
+  setPlayerNames,
+  targetScore,
+  setTargetScore,
+  gameMode,
+  setGameMode,
+  aiDifficulty,
+  setAiDifficulty,
+}) => {
+  const [names, setNames] = useState(playerNames);
+  const [target, setTarget] = useState(targetScore);
+  const [view, setView] = useState('game');
+  const [localGameMode, setLocalGameMode] = useState(gameMode || '2player');
+  const [localAiDifficulty, setLocalAiDifficulty] = useState(aiDifficulty || 'easy');
+
+  useEffect(() => {
+    setNames(playerNames);
+    setTarget(targetScore);
+    setLocalGameMode(gameMode);
+    setLocalAiDifficulty(aiDifficulty);
+  }, [playerNames, targetScore, gameMode, aiDifficulty]);
+
+  const handleSave = () => {
+    setPlayerNames(names);
+    setTargetScore(target);
+    setGameMode(localGameMode);
+    setAiDifficulty(localAiDifficulty);
+    onClose();
+  };
+
+  const renderContent = () => {
+    switch (view) {
+      case 'game':
+        return (
+          <GameSettings
+            names={names}
+            setNames={setNames}
+            target={target}
+            setTarget={setTarget}
+            gameMode={localGameMode}
+            setGameMode={setLocalGameMode}
+            aiDifficulty={localAiDifficulty}
+            setAiDifficulty={setLocalAiDifficulty}
+          />
+        );
+      case 'custom':
+        return <CustomSettings />;
+      case 'audio':
+        return <AudioSettings />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex justify-center items-start pt-2 sm:pt-4 z-50 overflow-y-auto">
+      <div className="bg-[#F5F2F4]/95 rounded-lg shadow-lg p-3 sm:p-4 flex flex-col items-center gap-3 w-full max-w-[90%] sm:max-w-3xl mx-auto my-4 sm:my-8">
+        {/* Header */}
+        <h1 className="flex font-mono items-center gap-2 text-[#24243A] w-fit px-3 py-1 sm:px-4 sm:py-2 rounded text-lg sm:text-xl">
+          <FontAwesomeIcon icon={faGear} className="text-black text-base sm:text-xl" />
+          SETTINGS
+          <hr />
+        </h1>
+       
+        {/* Content Area */}
+        <div className="w-full flex flex-col sm:flex-row font-mono">
+          {/* Buttons (stack vertically on mobile, horizontally on desktop) */}
+          <div className="flex sm:flex-col gap-2 sm:w-1/4 sm:pr-4 sm:border-r sm:border-gray-300 justify-center sm:justify-start mb-3 sm:mb-0">
+            <button
+              onClick={() => setView('game')}
+              className={`px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
+                view === 'game' ? 'bg-[#F5F2F4]/90' : 'bg-gray-200'
+              } hover:bg-gray-300 text-[#24243A] w-full sm:w-auto`}
+            >
+              Game
+            </button>
+            <button
+              onClick={() => setView('custom')}
+              className={`px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
+                view === 'custom' ? 'bg-[#F5F2F4]/90' : 'bg-gray-200'
+              } hover:bg-gray-300 text-[#24243A] w-full sm:w-auto`}
+            >
+              Custom
+            </button>
+            <button
+              onClick={() => setView('audio')}
+              className={`px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
+                view === 'audio' ? 'bg-[#F5F2F4]/90' : 'bg-gray-200'
+              } hover:bg-gray-300 text-[#24243A] w-full sm:w-auto`}
+            >
+              Audio
+            </button>
+          </div>
+
+          {/* Content (full width on mobile, 3/4 on desktop) */}
+          <div className="w-full sm:w-3/4 sm:pl-4">
+            {renderContent()}
+            <div className="flex justify-end p-2 gap-2">
+              <button
+                onClick={onClose}
+                className="p-2 px-4 sm:px-6 bg-[#D1D5DB] text-[#24243A] hover:bg-[#B2B8C1] rounded-md text-sm sm:text-base"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="p-2 px-4 sm:px-6 bg-[#4B8A65] text-white rounded hover:bg-[#5F9F7A] text-sm sm:text-base"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Settings;

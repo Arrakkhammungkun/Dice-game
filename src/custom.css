@@ -1,0 +1,10 @@
+.bg-plus-pattern {
+  background-color: #24243A;
+  background-image: radial-gradient(#3a3a55 1px, transparent 1px);
+  background-size: 20px 20px; 
+}
+
+.glow {
+  box-shadow: 0 0 20px #F5F2F4, 0 0 20px #F5F2F4, 0 0 20px #F5F2F4; /* สีเหลืองส้ม 0 0 20px #F0472B, 0 0 20px #F0472B, 0 0 20px #F0472B; */
+  transition: box-shadow 0.3s ease; /* เพิ่มการเปลี่ยนแปลงอย่างนุ่มนวล */
+}
