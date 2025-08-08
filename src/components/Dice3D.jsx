@@ -1,4 +1,4 @@
-// src/components/Dice3D.jsx
+
 import React, { useEffect, useRef, useState } from 'react';
 import './Dice3D.css';
 
