@@ -1,15 +1,16 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WinnerModal({ winner, winnerScore, onClose }) {
-  // จัดการกรณี winner หรือ winnerScore เป็น undefined
+
   const displayName = winner || 'Unknown Player';
   const displayScore = winnerScore !== undefined ? winnerScore : 0;
 
   return (
     <AnimatePresence>
       <motion.div
-        key={displayName + displayScore} // ใช้ key ที่ไม่ซ้ำโดยรวม score
+        key={displayName + displayScore} 
         className="fixed inset-0 bg-black/40 flex justify-center items-center z-50"
         onClick={onClose}
         initial={{ opacity: 0 }}

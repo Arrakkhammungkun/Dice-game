@@ -12,6 +12,7 @@ const faceTransform = {
 };
 
 export default function Dice3D({ isRolling, onRoll }) {
+  // eslint-disable-next-line no-unused-vars
   const [value, setValue] = useState(1);
   const diceRef = useRef(null);
 
@@ -32,11 +33,11 @@ export default function Dice3D({ isRolling, onRoll }) {
       // หลังจากนั้นหมุนไปหน้าที่ได้จริง
       setTimeout(() => {
         const dice = diceRef.current;
+        // eslint-disable-next-line no-unused-vars
         let hasFired = false;
         const handleTransitionEnd = () => {
           hasFired = true;
-          console.log("Dice3D roll complete", newValue);
-          onRoll?.(newValue); // ✅ เรียกเมื่อหมุนจบจริง
+          onRoll?.(newValue); 
           dice.removeEventListener('transitionend', handleTransitionEnd);
         };
 
@@ -45,7 +46,7 @@ export default function Dice3D({ isRolling, onRoll }) {
       }, 1000);
 
     }
-  }, [isRolling]);
+  }, [isRolling, onRoll]);
 
   return (
     <div className="dice-container">

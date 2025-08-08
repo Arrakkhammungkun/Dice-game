@@ -20,16 +20,16 @@ function App() {
   const [gameHistory, setGameHistory] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-    // โหลดประวัติจาก localStorage เมื่อเริ่ม
+  // โหลดประวัติจาก localStorage เมื่อเริ่ม
   useEffect(() => {
     const loadHistory = () => {
       try {
         const savedHistory = localStorage.getItem('gameHistory');
-        console.log('Loaded from localStorage:', savedHistory);
+    
         if (savedHistory) {
           const parsedHistory = JSON.parse(savedHistory);
           if (Array.isArray(parsedHistory)) {
-            console.log('Parsed gameHistory:', parsedHistory);
+           
             setGameHistory(parsedHistory);
           } else {
             console.error('Invalid gameHistory format in localStorage:', parsedHistory);
@@ -43,13 +43,13 @@ function App() {
         console.error('Failed to load gameHistory from localStorage:', e);
         setGameHistory([]);
       } finally {
-        setIsLoaded(true); // ตั้งค่า isLoaded หลังโหลดเสร็จ
+        setIsLoaded(true); 
       }
     };
 
     loadHistory();
 
-    // Listen for storage events from other tabs
+  
     window.addEventListener('storage', loadHistory);
     return () => window.removeEventListener('storage', loadHistory);
   }, []);
@@ -57,15 +57,11 @@ function App() {
   // บันทึกประวัติเมื่อ gameHistory เปลี่ยน
   useEffect(() => {
     if (!isLoaded) {
-      console.log('Skipping save to localStorage: waiting for load to complete');
       return;
     }
 
     try {
-      console.log('Saving gameHistory to localStorage:', gameHistory);
       localStorage.setItem('gameHistory', JSON.stringify(gameHistory));
-      const testRead = localStorage.getItem('gameHistory');
-      console.log('Test read after save:', testRead);
     } catch (e) {
       console.error('Failed to save gameHistory to localStorage:', e);
     }
@@ -79,7 +75,6 @@ function App() {
   };
 
   const handleGameEnd = (gameData) => {
-    console.log('Received gameData:', gameData);
     setGameHistory((prev) => {
       const isDuplicate = prev.some(
         (game) =>
@@ -89,11 +84,9 @@ function App() {
            JSON.stringify(game.scores) === JSON.stringify(gameData.scores))
       );
       if (isDuplicate) {
-        console.log('Duplicate gameData ignored:', gameData);
         return prev;
       }
       const updatedHistory = [gameData, ...prev];
-      console.log('Updated gameHistory:', updatedHistory);
       return updatedHistory;
     });
   };
@@ -138,7 +131,7 @@ function App() {
             onGameEnd={handleGameEnd}
           />
           )}
-         {view === 'history' && <History gameHistory={gameHistory} />}
+         {view === 'history' && <History gameHistory={gameHistory} setGameHistory={setGameHistory} />}
       </div>  
      
     </div>

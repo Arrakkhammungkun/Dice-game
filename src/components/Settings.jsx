@@ -1,4 +1,3 @@
-import { div } from 'framer-motion/client';
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
@@ -62,45 +61,48 @@ const Settings = ({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-start pt-2 sm:pt-4 z-50 overflow-y-auto">
-      <div className="bg-[#F5F2F4]/95 rounded-lg shadow-lg p-3 sm:p-4 flex flex-col items-center gap-3 w-full max-w-[90%] sm:max-w-3xl mx-auto my-4 sm:my-8">
-        {/* Header */}
-        <h1 className="flex font-mono items-center gap-2 text-[#24243A] w-fit px-3 py-1 sm:px-4 sm:py-2 rounded text-lg sm:text-xl">
-          <FontAwesomeIcon icon={faGear} className="text-black text-base sm:text-xl" />
+      <div className="bg-[#121417]/95  rounded-lg shadow-lg p-3 sm:p-4 flex flex-col items-center gap-3 w-full max-w-[90%] sm:max-w-3xl mx-auto my-4 sm:my-8">
+       
+       
+        <h1 className="flex font-mono items-center gap-2 text-[#F5F2F4] w-fit px-3 py-1 sm:px-4 sm:py-2 rounded text-lg sm:text-xl">
+          <FontAwesomeIcon icon={faGear} className="text-[#F5F2F4] text-base sm:text-xl" />
           SETTINGS
           <hr />
         </h1>
        
         {/* Content Area */}
         <div className="w-full flex flex-col sm:flex-row font-mono">
-          {/* Buttons (stack vertically on mobile, horizontally on desktop) */}
+       
+       
           <div className="flex sm:flex-col gap-2 sm:w-1/4 sm:pr-4 sm:border-r sm:border-gray-300 justify-center sm:justify-start mb-3 sm:mb-0">
             <button
               onClick={() => setView('game')}
-              className={`px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-                view === 'game' ? 'bg-[#F5F2F4]/90' : 'bg-gray-200'
-              } hover:bg-gray-300 text-[#24243A] w-full sm:w-auto`}
+              className={`px-3 py-2 sm:px-4 sm:py-2  rounded text-sm sm:text-base ${
+                view === 'game' ? 'bg-[#479586]/90 text-[#fff' : 'bg-[#1F2937]'
+              } hover:bg-[#374151] text-[#F5F2F4] w-full sm:w-auto`}
             >
               Game
             </button>
             <button
               onClick={() => setView('custom')}
-              className={`px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-                view === 'custom' ? 'bg-[#F5F2F4]/90' : 'bg-gray-200'
-              } hover:bg-gray-300 text-[#24243A] w-full sm:w-auto`}
+              className={`px-3 py-2 sm:px-4 sm:py-2  rounded text-sm sm:text-base ${
+                view === 'custom' ? 'bg-[#479586]/90 text-[#fff' : 'bg-[#1F2937]'
+              } hover:bg-[#374151] text-[#F5F2F4] w-full sm:w-auto`}
             >
               Custom
             </button>
             <button
               onClick={() => setView('audio')}
-              className={`px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-                view === 'audio' ? 'bg-[#F5F2F4]/90' : 'bg-gray-200'
-              } hover:bg-gray-300 text-[#24243A] w-full sm:w-auto`}
+              className={`px-3 py-2 sm:px-4 sm:py-2  rounded text-sm sm:text-base ${
+                view === 'audio' ? 'bg-[#479586]/90 text-[#fff' : 'bg-[#1F2937]'
+              } hover:bg-[#374151] text-[#F5F2F4] w-full sm:w-auto`}
             >
               Audio
             </button>
           </div>
 
-          {/* Content (full width on mobile, 3/4 on desktop) */}
+         
+         
           <div className="w-full sm:w-3/4 sm:pl-4">
             {renderContent()}
             <div className="flex justify-end p-2 gap-2">

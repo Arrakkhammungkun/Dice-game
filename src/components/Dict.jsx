@@ -1,24 +1,16 @@
-import React, { useState,useEffect } from 'react';
+import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Dice3D from './Dice3D'; 
 
 
 function Dice({ rollDice ,holdScore,isAiTurn,isRolling,setIsRolling }) {
-
-
-    // const handleRoll = () => {
-    //     setIsRolling(true);
-    //     setTimeout(() => {
-    //         const newValue = Math.floor(Math.random() * 6) + 1;
-    //         setDiceValue(newValue);
-    //         setIsRolling(false);
-    //         rollDice(newValue);
-    //     }, 1000);
-    // };
+    // เลือกสุ่มลูกเต๋า
     const handleRoll = () => {
         if (isRolling || isAiTurn) return;
         setIsRolling(true);
     };
+    //เก็บคะแนน
     const handleResult = (value) => {
         setIsRolling(false);
         if (rollDice) rollDice(value);
@@ -42,13 +34,7 @@ function Dice({ rollDice ,holdScore,isAiTurn,isRolling,setIsRolling }) {
                 >
                     HOLD SCORE
                 </button>
-                {/* <button
-                    onClick={newGame}
-                    className="text-xl mt-2 sm:mt-12 lg:mt-3 p-2 px-18 md:mt-2 sm:px-6 lg:px-22  bg-gradient-to-br from-[#7FB8E3] to-[#7FB8E3] text-white rounded-3xl w-full sm:w-auto disabled:opacity-50 hover:from-[#7BC69A] hover:to-[#4F8D68]"
-                    disabled={isRolling}
-                >
-                    NEW GAME
-                </button> */}
+
             </div>
 
         </div>

@@ -1,4 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
+// eslint-disable-next-line no-unused-vars
+import { motion,AnimatePresence } from 'framer-motion';
 
 export default function ConfirmModal({ isOpen, onConfirm, onCancel }) {
   return (

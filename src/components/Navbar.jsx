@@ -22,11 +22,14 @@ const Navbar = ({
 
   const handleNewGameClick = () => {
     setShowModal(true);
+   
   };
+  
 
   const confirmNewGame = () => {
     setShowModal(false);
     NewGame();
+    setView('game')
   };
 
   const handleSettingsClick = () => {
@@ -92,7 +95,7 @@ const Navbar = ({
         </div>
       </div>
 
-      {/* เมนูสำหรับมือถือ (แสดงเมื่อกด Hamburger) */}
+      {/* เมนูสำหรับมือถือ  */}
       {isMenuOpen && (
         <div className="sm:hidden flex flex-col items-center bg-[#141424] p-4 space-y-3  mt-2">
           <button
@@ -128,14 +131,15 @@ const Navbar = ({
         </div>
       )}
 
-      {/* ConfirmModal */}
+ 
       <ConfirmModal
         isOpen={showModal}
         onConfirm={confirmNewGame}
         onCancel={cancelNewGame}
+       
       />
 
-      {/* Settings Modal */}
+   
       {showSettings && (
         <Settings
           onClose={() => setShowSettings(false)}

@@ -29,8 +29,8 @@ function GameBoard({
   const [nextRoll, setNextRoll] = useState(false);
   const [lastRoll, setLastRoll] = useState(0);
   const [startTime, setStartTime] = useState(Date.now());
-  const [maxCurrentScores, setMaxCurrentScores] = useState([0, 0]);
-  const [hasEnded, setHasEnded] = useState(false); // Flag เพื่อป้องกันการบันทึกซ้ำ
+
+  const [hasEnded, setHasEnded] = useState(false);
   const [rollOnesCount, setRollOnesCount] = useState(0)
 
   const isAiTurn = gameMode === 'vsAI' && currentPlayer === 1 && !gameOver;
@@ -39,39 +39,9 @@ function GameBoard({
     setStartTime(Date.now());
   }, []);
 
-  useEffect(() => {
-    setMaxCurrentScores((prev) => {
-      const newMax = [...prev];
-      newMax[currentPlayer] = Math.max(newMax[currentPlayer], currentScore);
-      return newMax;
-    });
-  }, [currentScore, currentPlayer]);
+
 
   useEffect(() => {
-    console.log(
-      'game mode',
-      gameMode,
-      'isAiTurn',
-      isAiTurn,
-      'isRolling',
-      isRolling,
-      'aiRolling',
-      aiRolling,
-      'currentScore',
-      currentScore,
-      'currentPlayer',
-      currentPlayer,
-      'aiTurnActive',
-      aiTurnActive,
-      'nextRoll',
-      nextRoll,
-      'lastRoll',
-      lastRoll,
-      'scores',
-      scores,
-      'maxCurrentScores',
-      maxCurrentScores
-    );
 
     if (isAiTurn && !aiRolling && !isRolling && !aiTurnActive) {
       setAiTurnActive(true);
@@ -88,6 +58,7 @@ function GameBoard({
     if (isAiTurn && !isRolling && currentScore > 0) {
       checkAiStrategy(lastRoll);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentScore, isAiTurn, isRolling, lastRoll]);
 
   const aiTurn = () => {
@@ -124,17 +95,6 @@ function GameBoard({
   };
 
   const checkAiStrategy = (roll) => {
-    console.log(
-      'checkAiStrategy',
-      'currentScore',
-      currentScore,
-      'aiDifficulty',
-      aiDifficulty,
-      'roll',
-      roll,
-      'maxCurrentScores',
-      maxCurrentScores
-    );
 
     if (!isAiTurn || aiRolling) return;
 
@@ -203,7 +163,6 @@ function GameBoard({
 
   const holdScore = () => {
     if (hasEnded) {
-      console.log('Game already ended, skipping holdScore');
       return;
     }
 
@@ -212,7 +171,6 @@ function GameBoard({
     newScores[currentPlayer] = newTotalScore;
 
     setScores(newScores);
-    console.log('New scores:', newScores);
 
     try {
       audio_success_bank.play();
@@ -234,15 +192,13 @@ function GameBoard({
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         winner,
         scores: newScores,
-        maxCurrentScores,
         duration,
         timestamp: new Date().toISOString(),
         gameMode,
         aiDifficulty: gameMode === 'vsAI' ? aiDifficulty : null,
-        status: 'Game End',
         rollOnesCount,
+        playerNames: gameMode === 'vsAI' ? [playerNames[0], `AI (${aiDifficulty})`] : playerNames,
       };
-      console.log('Game ended with data:', gameData);
       onGameEnd(gameData);
     }
 
@@ -270,7 +226,7 @@ function GameBoard({
             setGameOver(false);
             setHasEnded(false);
             setStartTime(Date.now());
-            setMaxCurrentScores([0, 0]);
+
             setRollOnesCount(0)
           }}
         />
@@ -288,23 +244,7 @@ function GameBoard({
         isRolling={isRolling}
         setIsRolling={setIsRolling}
       />
-      {gameOver && (
-        <button
-          className="mt-4 px-4 py-2 bg-[#4B8A65] text-white rounded hover:bg-[#5F9F7A] text-sm sm:text-base"
-          onClick={() => {
-            setScores([0, 0]);
-            setCurrentScore(0);
-            setCurrentPlayer(0);
-            setGameOver(false);
-            setHasEnded(false);
-            setStartTime(Date.now());
-            setMaxCurrentScores([0, 0]);
-            setRollOnesCount(0)
-          }}
-        >
-          New Game
-        </button>
-      )}
+
     </div>
   );
 }
