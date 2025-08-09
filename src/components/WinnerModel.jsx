@@ -2,15 +2,14 @@ import React from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function WinnerModal({ winner, winnerScore, onClose }) {
-
+function WinnerModal({ winner, winnerScore, scores, onClose, gameMode, tournamentOver }) {
   const displayName = winner || 'Unknown Player';
   const displayScore = winnerScore !== undefined ? winnerScore : 0;
 
   return (
     <AnimatePresence>
       <motion.div
-        key={displayName + displayScore} 
+        key={displayName + displayScore}
         className="fixed inset-0 bg-black/40 flex justify-center items-center z-50"
         onClick={onClose}
         initial={{ opacity: 0 }}
@@ -26,38 +25,27 @@ export default function WinnerModal({ winner, winnerScore, onClose }) {
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
         >
-          <h2 className="text-xl sm:text-2xl font-bold mb-4 text-[#479586]">YOU WON!</h2>
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 text-[#479586]">
+            {gameMode === 'tournament' && tournamentOver ? 'Tournament Winner!' : 'Game Over!'}
+          </h2>
           <h2 className="text-xl sm:text-2xl font-bold mb-2 text-[#24243A]">{displayName}</h2>
-          <p className="text-md sm:text-xl mb-6 text-[#24243A]">Score: {displayScore}</p>
-          <div className="flex flex-col-reverse sm:flex-row justify-center gap-2 sm:gap-4 lg:mt-12">
-            <button
-              onClick={onClose}
-              className="px-3 sm:px-4 py-1 sm:py-2 bg-[#858e9c] text-white rounded hover:bg-[#6B7280]"
-            >
-              BACK TO MENU
-            </button>
-            <button
-              onClick={onClose}
-              className="px-3 sm:px-4 py-1 sm:py-2 bg-[#FFD700] text-white rounded hover:bg-[#E8C83E]"
-            >
-              New Game
-            </button>
+          <p className="text-md sm:text-xl mb-6 text-[#24243A]">
+            {gameMode === 'tournament' ? 'Wins' : 'Score'}: {displayScore}
+          </p>
+          <div className="flex justify-center gap-4 mb-4">
+            <p className="text-[#E1A6E4]">{scores[0]}</p>
+            <p className="text-[#83FFE7]">{scores[1]}</p>
           </div>
+          <button
+            onClick={onClose}
+            className="px-3 sm:px-4 py-1 sm:py-2 bg-[#FFD700] text-white rounded hover:bg-[#E8C83E]"
+          >
+            New Game
+          </button>
         </motion.div>
       </motion.div>
-
-      <style>{`
-        @keyframes popIn {
-          from {
-            transform: scale(0.8);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </AnimatePresence>
   );
 }
+
+export default WinnerModal;

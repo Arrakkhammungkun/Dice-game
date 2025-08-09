@@ -2,6 +2,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './Dice3D.css';
 
+
+
 const faceTransform = {
   1: 'rotateX(0deg) rotateY(0deg)',       // front
   2: 'rotateY(90deg)',                    // left

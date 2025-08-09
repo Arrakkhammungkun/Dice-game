@@ -13,25 +13,46 @@ const Settings = ({
   setGameMode,
   aiDifficulty,
   setAiDifficulty,
+  tournamentConfig,
+  setTournamentConfig,
 }) => {
   const [names, setNames] = useState(playerNames);
   const [target, setTarget] = useState(targetScore);
   const [view, setView] = useState('game');
   const [localGameMode, setLocalGameMode] = useState(gameMode || '2player');
   const [localAiDifficulty, setLocalAiDifficulty] = useState(aiDifficulty || 'easy');
+  const [localTournamentConfig, setLocalTournamentConfig] = useState(
+    tournamentConfig || { bestOf: 3, currentRound: 1 }
+  );
 
   useEffect(() => {
     setNames(playerNames);
     setTarget(targetScore);
     setLocalGameMode(gameMode);
     setLocalAiDifficulty(aiDifficulty);
-  }, [playerNames, targetScore, gameMode, aiDifficulty]);
+    setLocalTournamentConfig(tournamentConfig || { bestOf: 3, currentRound: 1 });
+  }, [playerNames, targetScore, gameMode, aiDifficulty, tournamentConfig]);
 
   const handleSave = () => {
+    console.log('Saving settings:', {
+      names,
+      target,
+      localGameMode,
+      localAiDifficulty,
+      localTournamentConfig,
+    });
     setPlayerNames(names);
     setTargetScore(target);
     setGameMode(localGameMode);
     setAiDifficulty(localAiDifficulty);
+    if (typeof setTournamentConfig === 'function') {
+      setTournamentConfig({
+        ...localTournamentConfig,
+        currentRound: 1, // รีเซ็ต currentRound เมื่อบันทึก
+      });
+    } else {
+      console.error('setTournamentConfig is not a function:', setTournamentConfig);
+    }
     onClose();
   };
 
@@ -48,12 +69,15 @@ const Settings = ({
             setGameMode={setLocalGameMode}
             aiDifficulty={localAiDifficulty}
             setAiDifficulty={setLocalAiDifficulty}
+            tournamentConfig={localTournamentConfig}
+            setTournamentConfig={setLocalTournamentConfig}
+ 
           />
         );
       case 'custom':
-        return <CustomSettings />;
+        return <div>Custom Settings (Not Implemented)</div>;
       case 'audio':
-        return <AudioSettings />;
+        return <div>Audio Settings (Not Implemented)</div>;
       default:
         return null;
     }
@@ -61,48 +85,38 @@ const Settings = ({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-start pt-2 sm:pt-4 z-50 overflow-y-auto">
-      <div className="bg-[#121417]/95  rounded-lg shadow-lg p-3 sm:p-4 flex flex-col items-center gap-3 w-full max-w-[90%] sm:max-w-3xl mx-auto my-4 sm:my-8">
-       
-       
+      <div className="bg-[#121417]/95 rounded-lg shadow-lg p-3 sm:p-4 flex flex-col items-center gap-3 w-full max-w-[90%] sm:max-w-3xl mx-auto my-4 sm:my-8">
         <h1 className="flex font-mono items-center gap-2 text-[#F5F2F4] w-fit px-3 py-1 sm:px-4 sm:py-2 rounded text-lg sm:text-xl">
           <FontAwesomeIcon icon={faGear} className="text-[#F5F2F4] text-base sm:text-xl" />
           SETTINGS
-          <hr />
         </h1>
-       
-        {/* Content Area */}
         <div className="w-full flex flex-col sm:flex-row font-mono">
-       
-       
           <div className="flex sm:flex-col gap-2 sm:w-1/4 sm:pr-4 sm:border-r sm:border-gray-300 justify-center sm:justify-start mb-3 sm:mb-0">
             <button
               onClick={() => setView('game')}
-              className={`px-3 py-2 sm:px-4 sm:py-2  rounded text-sm sm:text-base ${
-                view === 'game' ? 'bg-[#479586]/90 text-[#fff' : 'bg-[#1F2937]'
+              className={`px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
+                view === 'game' ? 'bg-[#479586]/90 text-[#fff]' : 'bg-[#1F2937]'
               } hover:bg-[#374151] text-[#F5F2F4] w-full sm:w-auto`}
             >
               Game
             </button>
             <button
               onClick={() => setView('custom')}
-              className={`px-3 py-2 sm:px-4 sm:py-2  rounded text-sm sm:text-base ${
-                view === 'custom' ? 'bg-[#479586]/90 text-[#fff' : 'bg-[#1F2937]'
+              className={`px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
+                view === 'custom' ? 'bg-[#479586]/90 text-[#fff]' : 'bg-[#1F2937]'
               } hover:bg-[#374151] text-[#F5F2F4] w-full sm:w-auto`}
             >
               Custom
             </button>
             <button
               onClick={() => setView('audio')}
-              className={`px-3 py-2 sm:px-4 sm:py-2  rounded text-sm sm:text-base ${
-                view === 'audio' ? 'bg-[#479586]/90 text-[#fff' : 'bg-[#1F2937]'
+              className={`px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
+                view === 'audio' ? 'bg-[#479586]/90 text-[#fff]' : 'bg-[#1F2937]'
               } hover:bg-[#374151] text-[#F5F2F4] w-full sm:w-auto`}
             >
               Audio
             </button>
           </div>
-
-         
-         
           <div className="w-full sm:w-3/4 sm:pl-4">
             {renderContent()}
             <div className="flex justify-end p-2 gap-2">

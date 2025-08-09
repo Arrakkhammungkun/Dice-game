@@ -15,6 +15,9 @@ const Navbar = ({
   aiDifficulty,
   setAiDifficulty,
   setView,
+  tournamentConfig,
+  setTournamentConfig,
+
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -28,6 +31,7 @@ const Navbar = ({
 
   const confirmNewGame = () => {
     setShowModal(false);
+    setIsMenuOpen(false)
     NewGame();
     setView('game')
   };
@@ -52,6 +56,14 @@ const Navbar = ({
     setView('game');
     setIsMenuOpen(false);
   };
+  const handleLeaderboardClick = () => {
+    setView('leaderboard');
+    setIsMenuOpen(false);
+  };
+  const handleAchievementsdClick = () => {
+    setView('achievements');
+    setIsMenuOpen(false);
+  };
   return (
     <nav className="bg-[#141424] p-3 sm:p-4 w-full fixed top-0 left-0 z-50">
       <div className="flex items-center justify-between px-2 sm:px-4  lg:max-w-8xl mx-auto">
@@ -73,6 +85,18 @@ const Navbar = ({
             className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
           >
             Play
+          </button>
+          <button
+            onClick={handleLeaderboardClick}
+            className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
+          >
+            Leaderboard
+          </button>
+          <button
+            onClick={handleAchievementsdClick}
+            className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
+          >
+            Achievements
           </button>
           <button
             onClick={handleHistoryClick}
@@ -104,18 +128,26 @@ const Navbar = ({
           >
             Play
           </button>
-          <a
-            href="#"
-            className="text-gray-300 hover:text-white text-sm w-full text-center py-2"
-          >
-            About
-          </a>
+
           <button
             onClick={handleSettingsClick}
             className="text-gray-300 hover:text-white font-bold w-full text-center py-2 text-sm"
           >
             Settings
           </button>
+          <button
+            onClick={handleLeaderboardClick}
+            className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
+          >
+            Leaderboard
+          </button>
+          <button
+            onClick={handleAchievementsdClick}
+            className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
+          >
+            Achievements
+          </button>
+
           <button
             onClick={handleHistoryClick}
             className="text-gray-300 hover:text-white font-bold w-full text-center py-2 text-sm"
@@ -151,6 +183,8 @@ const Navbar = ({
           setGameMode={setGameMode}
           aiDifficulty={aiDifficulty}
           setAiDifficulty={setAiDifficulty}
+          tournamentConfig={tournamentConfig}
+          setTournamentConfig={setTournamentConfig}
         />
       )}
     </nav>

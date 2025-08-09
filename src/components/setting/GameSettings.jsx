@@ -1,33 +1,52 @@
-import { useEffect, useCallback } from "react";
-import React from "react";
+import React, { useEffect, useCallback } from 'react';
 
+export default React.memo(function GameSettings({
+  names,
+  setNames,
+  target,
+  setTarget,
+  gameMode,
+  setGameMode,
+  aiDifficulty,
+  setAiDifficulty,
+  tournamentConfig,
+  setTournamentConfig,
 
-export default React.memo(function GameSettings({ names, setNames, target, setTarget, gameMode, setGameMode, aiDifficulty, setAiDifficulty }) {
-  const handleNameChange = useCallback((value) => {
-    setNames([value, names[1]]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [names[1], setNames]);
+}) {
+  const handleNameChange = useCallback(
+    (value) => {
+      setNames([value, names[1]]);
+    },
+    [names, setNames]
+  );
+
 
   useEffect(() => {
     if (gameMode === 'vsAI') {
       const difficultyName = aiDifficulty
         ? aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)
         : 'Easy';
-      setNames((prev) => [prev[0], `AI [${difficultyName}]`]);
+      setNames((prev) => [prev[0] || 'Player 1', `AI [${difficultyName}]`]);
     } else {
-        setNames((prev) => {
-        const newNames = [prev[0], 'Player 2'];
-       
-        return newNames;
-      });
+      // รีเซ็ตเป็น Player 1 และ Player 2 สำหรับโหมด 2player หรือ tournament
+      setNames((prev) => [prev[0] || 'Player 1', 'Player 2']);
     }
   }, [gameMode, aiDifficulty, setNames]);
+
+  const defaultTournamentConfig = { bestOf: 3, currentRound: 1 };
+  const safeTournamentConfig = tournamentConfig || defaultTournamentConfig;
+
+  const handleBestOfChange = (e) => {
+    const newBestOf = Number(e.target.value);
+    console.log('BestOf changed:', { newBestOf, currentRound: 1 });
+    setTournamentConfig({ ...safeTournamentConfig, bestOf: newBestOf, currentRound: 1 });
+  };
 
   return (
     <div className="space-y-2 sm:space-y-4">
       <div className="flex items-center justify-center gap-2 sm:gap-4 mt-2">
         <hr className="border-1 w-1/4 sm:w-1/3 border-[#F5F2F4]" />
-        <p className="text-[#F5F2F4] text-base sm:text-md font-mono px-2 sm:px-4  whitespace-nowrap">
+        <p className="text-[#F5F2F4] text-base sm:text-md font-mono px-2 sm:px-4 whitespace-nowrap">
           Game Setting
         </p>
         <hr className="border-1 w-1/4 sm:w-1/3 border-[#F5F2F4]" />
@@ -37,9 +56,11 @@ export default React.memo(function GameSettings({ names, setNames, target, setTa
         <select
           value={gameMode}
           onChange={(e) => setGameMode(e.target.value)}
-className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"        >
+          className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"
+        >
           <option value="2player">2 Players</option>
           <option value="vsAI">Vs AI</option>
+          <option value="tournament">Tournament</option>
         </select>
       </div>
       {gameMode === 'vsAI' && (
@@ -48,10 +69,25 @@ className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] bor
           <select
             value={aiDifficulty}
             onChange={(e) => setAiDifficulty(e.target.value)}
-className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"          >
+            className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"
+          >
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
+          </select>
+        </div>
+      )}
+      {gameMode === 'tournament' && (
+        <div className="p-1 sm:p-2">
+          <label className="block mb-1 text-xs sm:text-sm font-semibold text-[#F5F2F4]">Tournament Mode (Best of):</label>
+          <select
+            value={safeTournamentConfig.bestOf}
+            onChange={handleBestOfChange}
+            className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"
+          >
+            <option value={3}>Best of 3</option>
+            <option value={5}>Best of 5</option>
+            <option value={7}>Best of 7</option>
           </select>
         </div>
       )}
@@ -60,7 +96,8 @@ className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] bor
         <select
           value={target}
           onChange={(e) => setTarget(Number(e.target.value))}
-className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"        >
+          className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"
+        >
           <option value={10}>10</option>
           <option value={50}>50</option>
           <option value={100}>100</option>
@@ -69,13 +106,13 @@ className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] bor
       </div>
       <div className="flex items-center justify-center gap-2 sm:gap-4 mt-2">
         <hr className="border-1 w-1/4 sm:w-1/3 border-[#F5F2F4]" />
-        <p className="text-[#F5F2F4] text-base sm:text-md font-mono px-2 sm:px-4  whitespace-nowrap">
+        <p className="text-[#F5F2F4] text-base sm:text-md font-mono px-2 sm:px-4 whitespace-nowrap">
           Player Setting
         </p>
         <hr className="border-1 w-1/4 sm:w-1/3 border-[#F5F2F4]" />
       </div>
       <div className="p-1 sm:p-2">
-        <label className="block mb-1 text-xs sm:text-sm font-semibold text-[#F5F2F4]">Player 1 Name</label>
+        <label className="block mb-1 text-xs sm:text-sm font-semibold text-[#F5F2F4]">Player 1 Name:</label>
         <input
           type="text"
           value={names[0]}
@@ -91,10 +128,10 @@ className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] bor
             type="text"
             value={names[1]}
             onChange={(e) => setNames([names[0], e.target.value])}
-className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"          />
+            className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"
+          />
         </div>
       )}
-
     </div>
   );
 });
