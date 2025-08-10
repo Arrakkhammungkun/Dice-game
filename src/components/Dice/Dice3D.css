@@ -112,3 +112,32 @@
   grid-column: 1 / span 2;
   justify-self: center;
 }
+
+
+
+
+
+
+.dice-default .dice-face {
+  background-color: #f5f2f4; /* สีขาว */
+  border-color: #383333;
+}
+.dice-default .dot {
+  background-color: #333; /* จุดดำ */
+}
+
+.dice-red .dice-face {
+  background-color: #ff4d4d; /* สีแดง */
+  border-color: #b22222;
+}
+.dice-red .dot {
+  background-color: #660000; /* จุดสีเข้ม */
+}
+
+.dice-gold .dice-face {
+  background-color: #ffd700; /* สีทอง */
+  border-color: #b8860b;
+}
+.dice-gold .dot {
+  background-color: #8b7500;
+}

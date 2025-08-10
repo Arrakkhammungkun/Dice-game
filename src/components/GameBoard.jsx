@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Dice from './Dict';
+import Dice from './Dice/Dict';
 import Scoreboard from './Scoreboard';
-import WinnerModal from './WinnerModel';
-import RoundWinnerModal from './RoundWinnerModal';
+import WinnerModal from './Model/WinnerModel';
+import RoundWinnerModal from './Model/RoundWinnerModal';
 
 const audio_success = new Audio('sounds/success.mp3');
 const audio_success_bank = new Audio('sounds/success_bank.mp3');
@@ -31,6 +31,7 @@ function GameBoard({
   tournamentWins,
   tournamentOver,
   newGame,
+  // timeLimit,
 }) {
   const [isRolling, setIsRolling] = useState(false)
   const [aiRolling, setAiRolling] = useState(false)
@@ -42,20 +43,17 @@ function GameBoard({
   const [rollOnesCount, setRollOnesCount] = useState(0)
   const [roundWinner, setRoundWinner] = useState(null);
   const [consecutiveOnes, setConsecutiveOnes] = useState([0, 0])
-
   const isAiTurn = gameMode === 'vsAI' && currentPlayer === 1 && !gameOver
-
-  // รีเซ็ต hasEnded เมื่อ gameOver หรือ tournamentOver เปลี่ยน
+  
+  // รีเซ็ต hasEnded 
   useEffect(() => {
-    console.log('GameBoard mounted or updated, gameOver:', gameOver, 'tournamentOver:', tournamentOver, 'hasEnded:', hasEnded);
     if (!gameOver || tournamentOver) {
-      console.log('Resetting hasEnded due to gameOver or tournamentOver')
       setHasEnded(false);
       setConsecutiveOnes([0, 0])
     }
   }, [gameOver, tournamentOver]);
 
-  // เล่น audio_win เมื่อ tournamentOver เปลี่ยนเป็น true
+  
   useEffect(() => {
     if (gameMode === 'tournament' && tournamentOver) {
       try {
@@ -86,6 +84,7 @@ function GameBoard({
     if (isAiTurn && !isRolling && currentScore > 0) {
       checkAiStrategy(lastRoll)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentScore, isAiTurn, isRolling, lastRoll])
 
   const aiTurn = () => {
@@ -137,7 +136,7 @@ function GameBoard({
     if (!isAiTurn || aiRolling) return;
 
     if (aiDifficulty === 'easy') {
-      if (Math.random() > 0.8 && currentScore > 0) {
+      if (Math.random() > 0.6 && currentScore > 0) {
         setTimeout(holdScore, 1000);
       } else if (currentScore > 0 && roll !== 1) {
         setNextRoll(true);
@@ -211,7 +210,6 @@ function GameBoard({
   };
 
   const holdScore = () => {
-    console.log('holdScore called, hasEnded:', hasEnded);
     if (hasEnded) return;
 
     const newTotalScore = scores[currentPlayer] + currentScore;
@@ -244,13 +242,7 @@ function GameBoard({
         consecutiveOnes,
       };
 
-      console.log('Game end triggered:', {
-        gameMode,
-        tournamentOver,
-        roundWinner: winner,
-        tournamentWins,
-        currentRound: tournamentConfig.currentRound,
-      });
+
 
       if (gameMode === 'tournament') {
         try {
@@ -284,7 +276,7 @@ function GameBoard({
   };
 
   const handleRoundClose = () => {
-    console.log('handleRoundClose called, resetting round')
+    
     setScores([0, 0])
     setCurrentScore(0)
     setCurrentPlayer(0)
@@ -298,7 +290,6 @@ function GameBoard({
 
   return (
     <div className="p-2 sm:p-4 rounded-lg max-w-3xl mx-auto my-4 sm:my-8">
-      {console.log('Render check:', { gameMode, tournamentOver, roundWinner, tournamentConfig })}
       {gameMode === 'tournament' && !tournamentOver && roundWinner && (
         <RoundWinnerModal
           roundWinner={roundWinner}
@@ -326,7 +317,6 @@ function GameBoard({
           winnerScore={scores[0] >= targetScore ? scores[0] : scores[1] || 0}
           scores={scores}
           onClose={() => {
-            console.log('WinnerModal closed, calling newGame');
             newGame();
           }}
           gameMode={gameMode}

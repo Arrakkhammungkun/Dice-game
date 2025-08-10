@@ -11,6 +11,8 @@ export default React.memo(function GameSettings({
   setAiDifficulty,
   tournamentConfig,
   setTournamentConfig,
+  timeLimit,
+  setTimeLimit,
 
 }) {
   const handleNameChange = useCallback(
@@ -41,6 +43,9 @@ export default React.memo(function GameSettings({
     console.log('BestOf changed:', { newBestOf, currentRound: 1 });
     setTournamentConfig({ ...safeTournamentConfig, bestOf: newBestOf, currentRound: 1 });
   };
+    const handleTimeLimitChange = (e) => {
+    setTimeLimit(Number(e.target.value));
+  };
 
   return (
     <div className="space-y-2 sm:space-y-4">
@@ -61,6 +66,8 @@ export default React.memo(function GameSettings({
           <option value="2player">2 Players</option>
           <option value="vsAI">Vs AI</option>
           <option value="tournament">Tournament</option>
+          {/* <option value="timed">Timed</option> */}
+
         </select>
       </div>
       {gameMode === 'vsAI' && (
@@ -88,6 +95,20 @@ export default React.memo(function GameSettings({
             <option value={3}>Best of 3</option>
             <option value={5}>Best of 5</option>
             <option value={7}>Best of 7</option>
+          </select>
+        </div>
+      )}
+      {gameMode === 'timed' && (
+        <div className="p-1 sm:p-2">
+          <label className="block mb-1 text-xs sm:text-sm font-semibold text-[#F5F2F4]">Time Limit:</label>
+          <select
+            value={timeLimit}
+            onChange={handleTimeLimitChange}
+            className="w-full p-2 sm:p-3 border-2 rounded-xl bg-[#2F3640] text-[#FFFFFF] border-[#4B5563] text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-[#966099] z-10"
+          >
+            <option value={45}>45 Seconds</option>
+            <option value={60}>1 Minute</option>
+            <option value={180}>3 Minutes</option>
           </select>
         </div>
       )}

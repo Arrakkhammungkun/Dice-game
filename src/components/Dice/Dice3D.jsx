@@ -13,7 +13,7 @@ const faceTransform = {
   6: 'rotateX(180deg)',                   // back
 };
 
-export default function Dice3D({ isRolling, onRoll }) {
+export default function Dice3D({ isRolling, onRoll ,}) {
   // eslint-disable-next-line no-unused-vars
   const [value, setValue] = useState(1);
   const diceRef = useRef(null);

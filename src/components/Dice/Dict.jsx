@@ -2,7 +2,7 @@ import React from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Dice3D from './Dice3D';
-// const icon_Dice = img('/icon/dice.png')
+
 
 function Dice({ rollDice, holdScore, isAiTurn, isRolling, setIsRolling }) {
     // เลือกสุ่มลูกเต๋า

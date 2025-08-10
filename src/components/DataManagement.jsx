@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import ConfirmDelete from './ConfirmDelete';
+import ConfirmDelete from './Model/ConfirmDelete';
 
 const DataManagement = ({ gameHistory, setGameHistory }) => {
   const [playerToDelete, setPlayerToDelete] = useState('');
@@ -49,34 +49,35 @@ const DataManagement = ({ gameHistory, setGameHistory }) => {
       return;
     }
 
-    const headers = [
-      'ID,Winner,Scores,Duration,Timestamp,GameMode,AI Difficulty,RollOnesCount,PlayerNames,BestOf,TournamentWinner,ConsecutiveOnes',
-    ];
+  const headers = [
+    'ID,Winner,Scores,Duration,Timestamp,GameMode,AI Difficulty,RollOnesCount,PlayerNames,BestOf,TournamentWinner,ConsecutiveOnes,TimeLimit',
+  ];
 
-    const rows = gameHistory.map((game) => {
-      const scores = game.tournamentWinner
-        ? (Array.isArray(game.tournamentWins) && game.tournamentWins.every(num => typeof num === 'number')
-            ? `(${game.tournamentWins.map(n => `${n}`).join('-')})`
-            : 'N/A')
-        : (Array.isArray(game.scores) && game.scores.every(num => typeof num === 'number')
-            ? `(${game.scores.map(n => `${n}`).join('-')})`
-            : 'N/A');
-      const durationFormatted = formatDuration(game.duration || 0);
-      return [
-        game.id || 'N/A',
-        `"${game.tournamentWinner || game.winner || 'N/A'}"`,
-        `"${scores}"`,
-        durationFormatted,
-        game.timestamp || 'N/A',
-        game.gameMode || 'N/A',
-        game.aiDifficulty || 'N/A',
-        game.rollOnesCount || 0,
-        `"${Array.isArray(game.playerNames) ? game.playerNames.join(',') : 'N/A'}"`,
-        game.bestOf || 'N/A',
-        game.tournamentWinner || 'N/A',
-        `"${Array.isArray(game.consecutiveOnes) ? game.consecutiveOnes.join(',') : '0,0'}"`,
-      ].join(',');
-    });
+  const rows = gameHistory.map((game) => {
+    const scores = game.tournamentWinner
+      ? (Array.isArray(game.tournamentWins) && game.tournamentWins.every(num => typeof num === 'number')
+          ? `(${game.tournamentWins.map(n => `${n}`).join('-')})`
+          : 'N/A')
+      : (Array.isArray(game.scores) && game.scores.every(num => typeof num === 'number')
+          ? `(${game.scores.map(n => `${n}`).join('-')})`
+          : 'N/A');
+    const durationFormatted = formatDuration(game.duration || 0);
+    return [
+      game.id || 'N/A',
+      `"${game.tournamentWinner || game.winner || 'N/A'}"`,
+      `"${scores}"`,
+      durationFormatted,
+      game.timestamp || 'N/A',
+      game.gameMode || 'N/A',
+      game.aiDifficulty || 'N/A',
+      game.rollOnesCount || 0,
+      `"${Array.isArray(game.playerNames) ? game.playerNames.join(',') : 'N/A'}"`,
+      game.bestOf || 'N/A',
+      game.tournamentWinner || 'N/A',
+      `"${Array.isArray(game.consecutiveOnes) ? game.consecutiveOnes.join(',') : '0,0'}"`,
+      game.timeLimit || 'N/A',
+    ].join(',');
+  });
 
     const csv = [headers, ...rows].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });

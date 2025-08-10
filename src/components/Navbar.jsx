@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
-import ConfirmModal from './ConfirmModal';
+import ConfirmModal from './Model/ConfirmModal';
 import Settings from './Settings';
 
 const Navbar = ({
@@ -17,7 +17,8 @@ const Navbar = ({
   setView,
   tournamentConfig,
   setTournamentConfig,
-
+  timeLimit,
+  setTimeLimit,
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -28,7 +29,6 @@ const Navbar = ({
    
   };
   
-
   const confirmNewGame = () => {
     setShowModal(false);
     setIsMenuOpen(false)
@@ -64,6 +64,11 @@ const Navbar = ({
     setView('achievements');
     setIsMenuOpen(false);
   };
+  const handleHelpClick = () => {
+    setView('help');
+    setIsMenuOpen(false);
+     setShowModal(false);
+  };
   return (
     <nav className="bg-[#141424] p-3 sm:p-4 w-full fixed top-0 left-0 z-50">
       <div className="flex items-center justify-between px-2 sm:px-4  lg:max-w-8xl mx-auto">
@@ -79,7 +84,7 @@ const Navbar = ({
         </button>
 
         {/* ปุ่มสำหรับเดสก์ท็อป */}
-        <div className="hidden sm:flex items-center space-x-3 sm:space-x-4 ">
+        <div className="hidden sm:flex items-center  ">
           <button
             onClick={handlePlayClick}
             className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
@@ -109,6 +114,12 @@ const Navbar = ({
             className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
           >
             Settings
+          </button>
+          <button
+            onClick={handleHelpClick}
+            className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
+          >
+            Help
           </button>
           <button
             onClick={handleNewGameClick}
@@ -135,6 +146,7 @@ const Navbar = ({
           >
             Settings
           </button>
+
           <button
             onClick={handleLeaderboardClick}
             className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
@@ -153,6 +165,12 @@ const Navbar = ({
             className="text-gray-300 hover:text-white font-bold w-full text-center py-2 text-sm"
           >
             History
+          </button>
+          <button
+            onClick={handleHelpClick}
+            className="text-gray-300 hover:text-white font-bold w-full text-center py-2 text-sm"
+          >
+           help
           </button>
           <button
             onClick={handleNewGameClick}
@@ -185,6 +203,8 @@ const Navbar = ({
           setAiDifficulty={setAiDifficulty}
           tournamentConfig={tournamentConfig}
           setTournamentConfig={setTournamentConfig}
+          timeLimit={timeLimit}
+          setTimeLimit={setTimeLimit}
         />
       )}
     </nav>

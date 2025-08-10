@@ -6,10 +6,10 @@ import Navbar from './components/Navbar';
 import History from './components/History';
 import Leaderboard from './components/Leaderboard';
 import Achievements from './components/Achievements';
-
+import Help from './components/Help';
 function App() {
   const [playerNames, setPlayerNames] = useState(['Player 1', 'Player 2']);
-  const [targetScore, setTargetScore] = useState(10);
+  const [targetScore, setTargetScore] = useState(100);
   const [view, setView] = useState('game');
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [scores, setScores] = useState([0, 0]);
@@ -19,14 +19,15 @@ function App() {
   const [aiDifficulty, setAiDifficulty] = useState('easy');
   const [gameHistory, setGameHistory] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [tournamentWins, setTournamentWins] = useState([0, 0]); 
+  const [tournamentWins, setTournamentWins] = useState([0, 0]);
   const [tournamentConfig, setTournamentConfig] = useState({ bestOf: 3, currentRound: 1 });
   const [tournamentOver, setTournamentOver] = useState(false);
   const [tournamentStartTime, setTournamentStartTime] = useState(Date.now());
   // eslint-disable-next-line no-unused-vars
   const [gameKey, setGameKey] = useState(Date.now());
-
-  // โหลดประวัติจาก localStorage
+  const [timeLimit, setTimeLimit] = useState(60);
+  const [timerStarted, setTimerStarted] = useState(false);
+  
   useEffect(() => {
     const loadHistory = () => {
       try {
@@ -89,7 +90,6 @@ function App() {
     return () => window.removeEventListener('storage', loadHistory);
   }, []);
 
-  // บันทึกประวัติเมื่อ gameHistory เปลี่ยน
   useEffect(() => {
     if (!isLoaded) return;
     try {
@@ -126,7 +126,7 @@ function App() {
     }
   }, [tournamentOver, isLoaded]);
 
- const newGame = () => {
+  const newGame = () => {
     console.log('newGame called, resetting:', { tournamentOver, tournamentWins, currentRound: tournamentConfig.currentRound });
     setScores([0, 0]);
     setCurrentScore(0);
@@ -137,41 +137,36 @@ function App() {
     setTournamentOver(false);
     setGameKey(Date.now());
     setTournamentStartTime(Date.now());
+    setTimerStarted(false);
     localStorage.removeItem('tournamentWins');
     localStorage.removeItem('tournamentOver');
   };
 
   const handleGameEnd = (gameData) => {
-    console.log('handleGameEnd called:', { gameData, tournamentWins, tournamentOver, bestOf: tournamentConfig.bestOf, gameMode });
 
-    // ตรวจสอบ gameData
     if (!gameData.winner || !gameData.scores) {
       console.warn('Invalid gameData, skipping:', gameData);
       return;
     }
 
-    // รีเซ็ต tournamentStartTime สำหรับรอบแรกของทัวร์นาเมนต์
-    if (gameMode === 'tournament' && tournamentConfig.currentRound === 1) {
-      console.log('Resetting tournamentStartTime for first round');
-      setTournamentStartTime(Date.now());
-    }
-
-    // บันทึก gameData เฉพาะโหมด 2player และ vsAI
-    if (gameMode !== 'tournament') {
-      setGameHistory((prev) => {
-        const isDuplicate = prev.some(
-          (game) =>
-            game.id === gameData.id ||
-            (game.timestamp === gameData.timestamp &&
-             game.winner === gameData.winner &&
-             JSON.stringify(game.scores) === JSON.stringify(gameData.scores))
-        );
-        if (isDuplicate) return prev;
-        return [gameData, ...prev];
-      });
-    }
+    setGameHistory((prev) => {
+      const isDuplicate = prev.some(
+        (game) =>
+          game.id === gameData.id ||
+          (game.timestamp === gameData.timestamp &&
+           (game.winner === gameData.winner || game.tournamentWinner === gameData.tournamentWinner) &&
+           JSON.stringify(game.scores || game.tournamentWins) === JSON.stringify(gameData.scores || gameData.tournamentWins))
+      );
+      if (isDuplicate) return prev;
+      return [gameData, ...prev];
+    });
 
     if (gameMode === 'tournament') {
+      if (tournamentConfig.currentRound === 1) {
+    
+        setTournamentStartTime(Date.now());
+      }
+
       const winnerIndex = gameData.winner === playerNames[0] ? 0 : 1;
       const newWins = [...tournamentWins];
       newWins[winnerIndex]++;
@@ -190,6 +185,8 @@ function App() {
           gameMode: gameMode || 'tournament',
           playerNames: playerNames.length ? playerNames : ['Player 1', 'Player 2'],
           bestOf: tournamentConfig?.bestOf || 3,
+          rollOnesCount: gameData.rollOnesCount || 0,
+          consecutiveOnes: gameData.consecutiveOnes || [0, 0],
         };
         console.log('Tournament end, saving tournamentData:', tournamentData);
         setGameHistory((prev) => {
@@ -210,6 +207,27 @@ function App() {
         }));
         setTournamentOver(false);
       }
+    } else if (gameMode === 'timed') {
+      const winner = gameData.scores[0] > gameData.scores[1] ? playerNames[0] : gameData.scores[1] > gameData.scores[0] ? playerNames[1] : 'Draw';
+      const timedGameData = {
+        ...gameData,
+        gameMode: 'timed',
+        timeLimit,
+        winner,
+      };
+      setGameHistory((prev) => {
+        const isDuplicate = prev.some(
+          (game) =>
+            game.id === timedGameData.id ||
+            (game.timestamp === timedGameData.timestamp &&
+             game.winner === timedGameData.winner &&
+             JSON.stringify(game.scores) === JSON.stringify(timedGameData.scores))
+        );
+        if (isDuplicate) return prev;
+        return [timedGameData, ...prev];
+      });
+      setGameOver(true);
+      setTimerStarted(false);
     }
   };
 
@@ -228,17 +246,10 @@ function App() {
         setView={setView}
         tournamentConfig={tournamentConfig}
         setTournamentConfig={setTournamentConfig}
+        timeLimit={timeLimit}
+        setTimeLimit={setTimeLimit}
       />
       <div className="container mx-auto p-4">
-        {/* {view === 'game' && gameMode === 'tournament' && (
-          <TournamentBoard
-            tournamentWins={tournamentWins}
-            tournamentConfig={tournamentConfig}
-            playerNames={playerNames}
-            tournamentOver={tournamentOver}
-          />
-        )} */}
-
         {view === 'game' && (
           <GameBoard
             playerNames={playerNames}
@@ -258,11 +269,15 @@ function App() {
             tournamentWins={tournamentWins}
             tournamentOver={tournamentOver}
             newGame={newGame}
+            timeLimit={timeLimit}
+            timerStarted={timerStarted}
+            setTimerStarted={setTimerStarted}
           />
         )}
         {view === 'history' && <History gameHistory={gameHistory} setGameHistory={setGameHistory} />}
         {view === 'leaderboard' && <Leaderboard gameHistory={gameHistory} />}
         {view === 'achievements' && <Achievements gameHistory={gameHistory} />}
+        {view === 'help'  && <Help setView={setView} />}
       </div>
     </div>
   );

@@ -5,6 +5,42 @@
 }
 
 .glow {
-  box-shadow: 0 0 20px #F5F2F4, 0 0 20px #F5F2F4, 0 0 20px #F5F2F4; /* สีเหลืองส้ม 0 0 20px #F0472B, 0 0 20px #F0472B, 0 0 20px #F0472B; */
-  transition: box-shadow 0.3s ease; /* เพิ่มการเปลี่ยนแปลงอย่างนุ่มนวล */
+  box-shadow: 0 0 20px #F5F2F4, 0 0 20px #F5F2F4, 0 0 20px #F5F2F4; 
+  transition: box-shadow 0.3s ease;
+}
+
+
+
+.glow-dark {
+  box-shadow: 0 0 20px #FFFFFF, 0 0 20px #FFFFFF, 0 0 20px #FFFFFF;
+  transition: box-shadow 0.3s ease;
+}
+
+.glow-neon {
+  box-shadow: 0 0 20px #39FF14, 0 0 20px #39FF14, 0 0 20px #39FF14;
+  transition: box-shadow 0.3s ease;
+}
+
+
+:root {
+  --neon-green: #39FF14;
+  --neon-blue: #00DDEB;
+  --neon-pink: #FF007F;
+  --neon-pink-dark: #CC0066;
+}
+
+.text-neon-green {
+  color: var(--neon-green);
+}
+
+.border-neon-blue {
+  border-color: var(--neon-blue);
+}
+
+.bg-neon-pink {
+  background-color: var(--neon-pink);
+}
+
+.bg-neon-pink-dark {
+  background-color: var(--neon-pink-dark);
 }

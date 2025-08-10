@@ -8,6 +8,8 @@ const History = ({ gameHistory, setGameHistory }) => {
       return `Vs AI (${game.aiDifficulty || 'unknown'})`;
     } else if (game.gameMode === 'tournament') {
       return `Tournament (Best of ${game.bestOf || 3})`;
+    } else if (game.gameMode === 'timed') {
+      return `Timed (${game.timeLimit || 60} sec)`;
     }
     return '2 Players';
   };
