@@ -19,6 +19,10 @@ const Navbar = ({
   setTournamentConfig,
   timeLimit,
   setTimeLimit,
+  selectedDice, 
+  setSelectedDice,
+  sounds,
+  setSounds,
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -70,14 +74,14 @@ const Navbar = ({
      setShowModal(false);
   };
   return (
-    <nav className="bg-[#141424] p-3 sm:p-4 w-full fixed top-0 left-0 z-50">
+    <nav className="bg-[#141424] p-3   sm:p-4 w-full fixed top-0 left-0 z-50 ">
       <div className="flex items-center justify-between px-2 sm:px-4  lg:max-w-8xl mx-auto">
        
-        <div className="text-white text-xl sm:text-3xl font-bold">Dict Game</div>
+        <div className="text-white text-xl sm:text-3xl font-bold ">Dict Game</div>
 
         {/* Hamburger Icon  */}
         <button
-          className="sm:hidden text-white text-xl focus:outline-none"
+          className="sm:hidden text-white  text-xl focus:outline-none"
           onClick={toggleMenu}
         >
           <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} />
@@ -93,7 +97,7 @@ const Navbar = ({
           </button>
           <button
             onClick={handleLeaderboardClick}
-            className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
+            className="text-gray-300   hover:text-white font-bold px-3 sm:px-4 py-1 sm:py-2 rounded text-sm sm:text-base"
           >
             Leaderboard
           </button>
@@ -123,7 +127,7 @@ const Navbar = ({
           </button>
           <button
             onClick={handleNewGameClick}
-            className="bg-[#F5F2F4] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded hover:bg-[#b4b2b3] text-sm sm:text-base"
+            className="bg-[#F5F2F4] light:text-[#24243A] light:hover:text-[#479586] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded hover:bg-[#b4b2b3] text-sm sm:text-base"
           >
             New Game
           </button>
@@ -205,6 +209,10 @@ const Navbar = ({
           setTournamentConfig={setTournamentConfig}
           timeLimit={timeLimit}
           setTimeLimit={setTimeLimit}
+          selectedDice={selectedDice} 
+          setSelectedDice={setSelectedDice}
+          sounds={sounds}
+          setSounds={setSounds}
         />
       )}
     </nav>

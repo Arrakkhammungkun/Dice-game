@@ -29,11 +29,10 @@ function WinnerModal({ winner, winnerScore, scores, onClose, gameMode, tournamen
             {gameMode === 'tournament' && tournamentOver ? 'Tournament Winner!' : 'Game Over!'}
           </h2>
           <h2 className="text-xl sm:text-2xl font-bold mb-2 text-[#24243A]">{displayName}</h2>
-          <p className="text-md sm:text-xl mb-6 text-[#24243A]">
-            {gameMode === 'tournament' ? 'Wins' : 'Score'}: {displayScore}
-          </p>
-          <div className="flex justify-center gap-4 mb-4">
+
+          <div className="flex justify-center gap-4 mb-4 text-xl sm:text-2xl">
             <p className="text-[#E1A6E4]">{scores[0]}</p>
+            <p>:</p>
             <p className="text-[#83FFE7]">{scores[1]}</p>
           </div>
           <button

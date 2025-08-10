@@ -13,7 +13,7 @@ const faceTransform = {
   6: 'rotateX(180deg)',                   // back
 };
 
-export default function Dice3D({ isRolling, onRoll ,}) {
+export default function Dice3D({ isRolling, onRoll , selectedDice }) {
   // eslint-disable-next-line no-unused-vars
   const [value, setValue] = useState(1);
   const diceRef = useRef(null);
@@ -51,42 +51,36 @@ export default function Dice3D({ isRolling, onRoll ,}) {
   }, [isRolling, onRoll]);
 
   return (
-    <div className="dice-container">
+    <div className={`dice-container dice-${selectedDice || 'default'}`}>
       <div className="dice" ref={diceRef}>
         <div className="dice-face front one">
           <span className="dot"></span>
         </div>
-
         <div className="dice-face back six">
           <div className="dot-grid six">
             {[...Array(6)].map((_, i) => <span key={i} className="dot"></span>)}
           </div>
         </div>
-
         <div className="dice-face right five">
           <div className="dot-grid five">
             {[...Array(5)].map((_, i) => <span key={i} className="dot"></span>)}
           </div>
         </div>
-
         <div className="dice-face left two">
           <div className="dot-grid two">
             {[...Array(2)].map((_, i) => <span key={i} className="dot"></span>)}
           </div>
         </div>
-
         <div className="dice-face top three">
           <div className="dot-grid three">
             {[...Array(3)].map((_, i) => <span key={i} className="dot"></span>)}
           </div>
         </div>
-
         <div className="dice-face bottom four">
           <div className="dot-grid four">
             {[...Array(4)].map((_, i) => <span key={i} className="dot"></span>)}
           </div>
         </div>
-
       </div>
     </div>
   );

@@ -4,14 +4,6 @@ import Scoreboard from './Scoreboard';
 import WinnerModal from './Model/WinnerModel';
 import RoundWinnerModal from './Model/RoundWinnerModal';
 
-const audio_success = new Audio('sounds/success.mp3');
-const audio_success_bank = new Audio('sounds/success_bank.mp3');
-const audio_fail = new Audio('sounds/fail.mp3');
-const audio_win = new Audio('sounds/win.mp3');
-const audio_round_win = new Audio('sounds/round_win.mp3');
-
-audio_win.onerror = () => console.error('Failed to load win.mp3');
-audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
 
 function GameBoard({
   playerNames,
@@ -32,6 +24,8 @@ function GameBoard({
   tournamentOver,
   newGame,
   // timeLimit,
+  selectedDice,
+  sounds,
 }) {
   const [isRolling, setIsRolling] = useState(false)
   const [aiRolling, setAiRolling] = useState(false)
@@ -44,7 +38,20 @@ function GameBoard({
   const [roundWinner, setRoundWinner] = useState(null);
   const [consecutiveOnes, setConsecutiveOnes] = useState([0, 0])
   const isAiTurn = gameMode === 'vsAI' && currentPlayer === 1 && !gameOver
+
+
+
   
+const audio_success = new Audio(`sounds/${sounds.rollSuccess}`);
+const audio_success_bank = new Audio(`sounds/${sounds.bank}`);
+const audio_fail = new Audio(`sounds/${sounds.fail}`);
+const audio_win = new Audio(`sounds/${sounds.win}`);
+const audio_round_win = new Audio(`sounds/${sounds.roundWin}`);
+
+audio_win.onerror = () => console.error('Failed to load win.mp3');
+audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
+
+
   // รีเซ็ต hasEnded 
   useEffect(() => {
     if (!gameOver || tournamentOver) {
@@ -349,6 +356,7 @@ function GameBoard({
         isAiTurn={isAiTurn}
         isRolling={isRolling}
         setIsRolling={setIsRolling}
+        selectedDice={selectedDice}
       />
     </div>
   );

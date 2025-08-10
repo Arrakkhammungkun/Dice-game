@@ -1,21 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
+import DiceFacePreview from "../Dice/DiceFacePreview";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUpRightAndDownLeftFromCenter } from "@fortawesome/free-solid-svg-icons";
 
 export default function CustomDiceSettings({
   selectedDice,
-  setSelectedDice,
   selectedTheme,
   setSelectedTheme,
+  onDiceChange,
 }) {
+  // eslint-disable-next-line no-unused-vars
+  const [temporarySelectedDice, setTemporarySelectedDice] = useState(selectedDice); 
+
   const diceOptions = [
-    { id: "default", name: "Default Dice", image: "/dice/default.png" },
-    { id: "red", name: "Red Dice", image: "/dice/red.png" },
-    { id: "gold", name: "Golden Dice", image: "/dice/gold.png" },
+    { id: "default", name: "Default Dice" },
+    { id: "red", name: "Red Dice" },
+    { id: "black", name: "Black Dice" },
   ];
 
   const themes = [
-    { id: "classic", name: "Classic", preview: "/themes/classic.png" },
-    { id: "dark", name: "Dark Mode", preview: "/themes/dark.png" },
-    { id: "neon", name: "Neon Glow", preview: "/themes/neon.png" },
+    { id: "light", name: "Light Mode", color: "#ffffff" },
+    { id: "dark", name: "Dark Mode", color: "#3333" },
+    { id: "colorful", name: "Colorful Mode", color: "#ECE3CA" },
   ];
 
   const toggleFullScreen = () => {
@@ -28,63 +34,73 @@ export default function CustomDiceSettings({
     }
   };
 
+  const handleDiceSelect = (diceId) => {
+    setTemporarySelectedDice(diceId); 
+    onDiceChange(diceId); 
+  };
+
+  const handleThemeSelect = (themeId) => {
+    setSelectedTheme(themeId); 
+
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      {/* เลือกลูกเต๋า */}
+  
       <div>
-        <h2 className="text-lg font-bold text-white">🎲 Select Dice Style</h2>
+        <h2 className="text-lg font-mono text-white "> Select Dice Style</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
           {diceOptions.map(dice => (
             <div
               key={dice.id}
-              onClick={() => setSelectedDice(dice.id)}
+               onClick={() => handleDiceSelect(dice.id)}
               className={`cursor-pointer p-2 rounded-lg border ${
                 selectedDice === dice.id
                   ? "border-green-400 bg-green-900/40"
                   : "border-gray-500"
               } hover:border-green-300`}
             >
-              <img
-                src={dice.image}
-                alt={dice.name}
-                className="w-full h-20 object-contain"
-              />
-              <p className="text-center text-white mt-2">{dice.name}</p>
+              <div className="mt-2">
+                  <DiceFacePreview  diceStyle={dice.id} face={1} />
+              </div>
+              <p className="text-center text-white mt-2 font-mono">{dice.name}</p>
             </div>
           ))}
         </div>
       </div>
-
-      {/* ปุ่ม Fullscreen */}
+ 
       <div>
-        <h2 className="text-lg font-bold text-white">🖥 Fullscreen Mode</h2>
+        <h2 className="text-lg font-mono text-white"> Fullscreen Mode</h2>
+
         <button
           onClick={toggleFullScreen}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mt-2"
+          className="px-4 py-2 flex items-center gap-1 bg-blue-500 text-white rounded hover:bg-blue-700 mt-2"
         >
-          Toggle Fullscreen
+          <FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} size="1x" />
+          Fullscreen
         </button>
       </div>
 
-      {/* เลือก Theme */}
+      
       <div>
-        <h2 className="text-lg font-bold text-white">🎨 Select Theme</h2>
+        <h2 className="text-lg font-mono text-white"> Select Theme</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
           {themes.map(theme => (
             <div
               key={theme.id}
-              onClick={() => setSelectedTheme(theme.id)}
+              onClick={() => handleThemeSelect(theme.id)}
               className={`cursor-pointer p-2 rounded-lg border ${
                 selectedTheme === theme.id
                   ? "border-green-400 bg-green-900/40"
                   : "border-gray-500"
               } hover:border-green-300`}
             >
-              <img
-                src={theme.preview}
-                alt={theme.name}
-                className="w-full h-20 object-cover rounded"
-              />
+              <div
+                className="w-full h-20 rounded  border-white border"
+                style={{ backgroundColor: theme.color }}
+              >
+
+              </div>
               <p className="text-center text-white mt-2">{theme.name}</p>
             </div>
           ))}

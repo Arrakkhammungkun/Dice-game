@@ -23,12 +23,43 @@ function App() {
   const [tournamentConfig, setTournamentConfig] = useState({ bestOf: 3, currentRound: 1 });
   const [tournamentOver, setTournamentOver] = useState(false);
   const [tournamentStartTime, setTournamentStartTime] = useState(Date.now());
+ 
   // eslint-disable-next-line no-unused-vars
   const [gameKey, setGameKey] = useState(Date.now());
   const [timeLimit, setTimeLimit] = useState(60);
   const [timerStarted, setTimerStarted] = useState(false);
+  const [selectedDice, setSelectedDice] = useState(localStorage.getItem('selectedDice') || 'default');
+  const [sounds, setSounds] = useState(() => ({
+    rollSuccess: localStorage.getItem('soundRollSuccess') || 'success.mp3',
+    bank: localStorage.getItem('soundBank') || 'success_bank.mp3',
+    fail: localStorage.getItem('soundFail') || 'fail.mp3',
+    win: localStorage.getItem('soundWin') || 'win.mp3',
+    roundWin: localStorage.getItem('soundRoundWin') || 'round_win.mp3',
+  }));
+
+  useEffect(() => { 
+    const applyTheme = () => {
+        let theme = localStorage.getItem("selectedTheme");
+        if (!theme) {
+          theme = "colorful"; 
+        }
+        if (theme === "system") {
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          theme = prefersDark ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", theme);
+      };
+    applyTheme(); 
+
   
-  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleSystemChange = () => {
+      if (localStorage.getItem("selectedTheme") === "system" || !localStorage.getItem("selectedTheme")) {
+        applyTheme();
+      }
+    };
+    mediaQuery.addEventListener("change", handleSystemChange);;
+    
     const loadHistory = () => {
       try {
         const savedHistory = localStorage.getItem('gameHistory');
@@ -232,7 +263,7 @@ function App() {
   };
 
   return (
-    <div className="bg-plus-pattern min-h-screen w-full pt-14 sm:pt-20 lg:pt-28">
+      <div className="bg-plus-pattern min-h-screen w-full pt-14 sm:pt-20 lg:pt-28 light:bg-white dark:bg-[#24243A] colorful:bg-[#ECE3CA]">      
       <Navbar
         NewGame={newGame}
         playerNames={playerNames}
@@ -248,6 +279,10 @@ function App() {
         setTournamentConfig={setTournamentConfig}
         timeLimit={timeLimit}
         setTimeLimit={setTimeLimit}
+        selectedDice={selectedDice} 
+        setSelectedDice={setSelectedDice}
+        sounds={sounds}
+        setSounds={setSounds}
       />
       <div className="container mx-auto p-4">
         {view === 'game' && (
@@ -272,6 +307,8 @@ function App() {
             timeLimit={timeLimit}
             timerStarted={timerStarted}
             setTimerStarted={setTimerStarted}
+            selectedDice={selectedDice}
+            sounds={sounds}
           />
         )}
         {view === 'history' && <History gameHistory={gameHistory} setGameHistory={setGameHistory} />}
