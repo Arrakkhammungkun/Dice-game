@@ -20,6 +20,8 @@ const Settings = ({
   setSelectedDice,
   sounds,
   setSounds,
+  timeLimit,
+  setTimeLimit,
 }) => {
   const [names, setNames] = useState(playerNames);
   const [target, setTarget] = useState(targetScore);
@@ -33,6 +35,7 @@ const Settings = ({
   const [temporarySelectedTheme, setTemporarySelectedTheme] = useState(selectedTheme); 
   const [temporarySelectedDice, setTemporarySelectedDice] = useState(selectedDice);
   const [temporarySounds, setTemporarySounds] = useState(sounds);
+  const [temporaryTimeLimit, setTemporaryTimeLimit] = useState(timeLimit || parseInt(localStorage.getItem('timeLimit')) || 45);
 
   useEffect(() => {
     setNames(playerNames);
@@ -41,12 +44,15 @@ const Settings = ({
     setLocalAiDifficulty(aiDifficulty);
     setTemporarySelectedDice(selectedDice);
     setTemporarySelectedTheme(selectedTheme); 
-    setTemporarySelectedTheme(selectedTheme)
     setLocalTournamentConfig(tournamentConfig || { bestOf: 3, currentRound: 1 });
-  }, [playerNames, targetScore, gameMode, aiDifficulty, tournamentConfig, selectedDice, selectedTheme,sounds]);
+    setTemporaryTimeLimit(parseInt(localStorage.getItem('timeLimit')) || timeLimit || 45);
+  }, [playerNames, targetScore, gameMode, aiDifficulty, tournamentConfig, selectedDice, selectedTheme,sounds,timeLimit]);
 
+  //บันทึกข้อมูล
   const handleSave = () => {
-    
+    setTimeLimit(temporaryTimeLimit);
+    localStorage.setItem('timeLimit', temporaryTimeLimit);
+
     localStorage.setItem('selectedTheme', temporarySelectedTheme);
     document.documentElement.setAttribute("data-theme", temporarySelectedTheme);
     setSelectedTheme(temporarySelectedTheme);
@@ -71,7 +77,7 @@ const Settings = ({
     });
     onClose();
   };
-
+  //เมื่อเปลี่ยน หน้าใน model settings
   const renderContent = () => {
     switch (view) {
       case 'game':
@@ -87,6 +93,8 @@ const Settings = ({
             setAiDifficulty={setLocalAiDifficulty}
             tournamentConfig={localTournamentConfig}
             setTournamentConfig={setLocalTournamentConfig}
+            timeLimit={temporaryTimeLimit}
+            setTimeLimit={setTemporaryTimeLimit}
           />
         );
       case 'custom':
@@ -94,8 +102,8 @@ const Settings = ({
           <CustomDiceSettings
             selectedDice={temporarySelectedDice} 
             setSelectedDice={setTemporarySelectedDice} 
-            selectedTheme={temporarySelectedTheme} // ใช้ temporary
-            setSelectedTheme={setTemporarySelectedTheme} // Update temporary
+            selectedTheme={temporarySelectedTheme} 
+            setSelectedTheme={setTemporarySelectedTheme}
             onDiceChange={setTemporarySelectedDice}
           />
         );

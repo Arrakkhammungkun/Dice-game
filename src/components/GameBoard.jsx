@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Dice from './Dice/Dict';
 import Scoreboard from './Scoreboard';
 import WinnerModal from './Model/WinnerModel';
 import RoundWinnerModal from './Model/RoundWinnerModal';
-
 
 function GameBoard({
   playerNames,
@@ -23,124 +22,209 @@ function GameBoard({
   tournamentWins,
   tournamentOver,
   newGame,
-  // timeLimit,
+  timeLimit,
+  timerStarted,
+  setTimerStarted,
+  startTimer,
   selectedDice,
   sounds,
 }) {
-  const [isRolling, setIsRolling] = useState(false)
-  const [aiRolling, setAiRolling] = useState(false)
-  const [aiTurnActive, setAiTurnActive] = useState(false)
-  const [nextRoll, setNextRoll] = useState(false)
-  const [lastRoll, setLastRoll] = useState(0)
-  const [startTime, setStartTime] = useState(Date.now())
-  const [hasEnded, setHasEnded] = useState(false)
-  const [rollOnesCount, setRollOnesCount] = useState(0)
+  const [isRolling, setIsRolling] = useState(false);
+  const [aiRolling, setAiRolling] = useState(false);
+  const [aiTurnActive, setAiTurnActive] = useState(false);
+  const [nextRoll, setNextRoll] = useState(false);
+  const [lastRoll, setLastRoll] = useState(0);
+  const [startTime, setStartTime] = useState(Date.now());
+  const [hasEnded, setHasEnded] = useState(false);
+  const [rollOnesCount, setRollOnesCount] = useState(0);
   const [roundWinner, setRoundWinner] = useState(null);
-  const [consecutiveOnes, setConsecutiveOnes] = useState([0, 0])
-  const isAiTurn = gameMode === 'vsAI' && currentPlayer === 1 && !gameOver
+  const [consecutiveOnes, setConsecutiveOnes] = useState([0, 0]);
+  const [bonusTriggered, setBonusTriggered] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(timeLimit);
+  const isAiTurn = gameMode === 'vsAI' && currentPlayer === 1 && !gameOver;
+  const isRollingRef = useRef(isRolling);
 
+  const audio_bonus = new Audio('sounds/Bonus.mp3');
+  const audio_success = new Audio(`sounds/${sounds.rollSuccess}`);
+  const audio_success_bank = new Audio(`sounds/${sounds.bank}`);
+  const audio_fail = new Audio(`sounds/${sounds.fail}`);
+  const audio_win = new Audio(`sounds/${sounds.win}`);
+  const audio_round_win = new Audio(`sounds/${sounds.roundWin}`);
 
+  // จัดการข้อผิดพลาดเมื่อโหลดไฟล์เสียง
+  audio_win.onerror = () => console.error('Failed to load win.mp3');
+  audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
+  audio_bonus.onerror = () => console.error('Failed to load Bonus.mp3');
+    // อัปเดต isRollingRef เมื่อ isRolling เปลี่ยน เพื่อใช้ใน aiTurn และป้องกันการทอยซ้ำ
+  useEffect(() => {
+    isRollingRef.current = isRolling;
+  }, [isRolling]);
 
-  
-const audio_success = new Audio(`sounds/${sounds.rollSuccess}`);
-const audio_success_bank = new Audio(`sounds/${sounds.bank}`);
-const audio_fail = new Audio(`sounds/${sounds.fail}`);
-const audio_win = new Audio(`sounds/${sounds.win}`);
-const audio_round_win = new Audio(`sounds/${sounds.roundWin}`);
-
-audio_win.onerror = () => console.error('Failed to load win.mp3');
-audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
-
-
-  // รีเซ็ต hasEnded 
+    // รีเซ็ตสถานะเมื่อเกมจบหรือเริ่มใหม่
   useEffect(() => {
     if (!gameOver || tournamentOver) {
       setHasEnded(false);
-      setConsecutiveOnes([0, 0])
+      setConsecutiveOnes([0, 0]);
+      setBonusTriggered(false);
+      if (gameMode === 'timed') {
+        setTimeRemaining(timeLimit);
+      }
     }
-  }, [gameOver, tournamentOver]);
+  }, [gameOver, tournamentOver, gameMode, timeLimit]);
 
-  
+  // จัดการสถานะโบนัส
+  useEffect(() => {
+    if (bonusTriggered) {
+      const timer = setTimeout(() => {
+        setBonusTriggered(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [bonusTriggered]);
+
+  // เล่นเสียงชนะเมื่อ tournament จบ
   useEffect(() => {
     if (gameMode === 'tournament' && tournamentOver) {
       try {
         audio_win.play();
       } catch (e) {
-        console.log('Audio play failed for win.mp3:', e)
+        console.log('Audio play failed for win.mp3:', e);
       }
     }
-  }, [tournamentOver, gameMode])
+  }, [tournamentOver, gameMode]);
 
+  // ตั้งค่าเวลาเริ่มต้นเมื่อ component เริ่มทำงาน
   useEffect(() => {
     setStartTime(Date.now());
   }, []);
 
+ // จัดการตัวจับเวลาในโหมด timed
   useEffect(() => {
-    if (isAiTurn && !aiRolling && !isRolling && !aiTurnActive) {
+    if (gameMode === 'timed' && timerStarted && !gameOver) {
+      const timer = setInterval(() => {
+        setTimeRemaining((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            const winner = scores[0] > scores[1] ? playerNames[0] : scores[1] > scores[0] ? playerNames[1] : 'Draw';
+            const duration = Math.floor((Date.now() - startTime) / 1000);
+            const gameData = {
+              id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              winner,
+              scores: [...scores],
+              duration,
+              timestamp: new Date().toISOString(),
+              gameMode: 'timed',
+              timeLimit,
+              playerNames: [...playerNames],
+              rollOnesCount,
+              consecutiveOnes,
+            };
+            audio_win.play();
+            setGameOver(true);
+            setTimerStarted(false);
+            setHasEnded(true);
+            setIsRolling(false); 
+            onGameEnd(gameData);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [timerStarted, gameMode, timeLimit, gameOver, scores, playerNames, startTime, rollOnesCount, consecutiveOnes, onGameEnd, setGameOver, setTimerStarted]);
+
+
+   // จัดการตาของ AI ในโหมด vsAI
+  useEffect(() => {
+    if (isAiTurn && !aiRolling && !isRolling && !aiTurnActive && !gameOver && !hasEnded) {
       setAiTurnActive(true);
       setTimeout(() => aiTurn(), 1000);
-    } else if (isAiTurn && !aiRolling && !isRolling && nextRoll) {
+    } else if (isAiTurn && !aiRolling && !isRolling && nextRoll && !gameOver && !hasEnded) {
       setTimeout(() => {
         setNextRoll(false);
         aiTurn();
       }, 1000);
     }
-  }, [isAiTurn, aiRolling, isRolling, aiTurnActive, nextRoll])
+  }, [isAiTurn, aiRolling, isRolling, aiTurnActive, nextRoll, gameOver, hasEnded]);
 
+  // ตรวจสอบกลยุทธ์ AI หลังการทอย
   useEffect(() => {
     if (isAiTurn && !isRolling && currentScore > 0) {
-      checkAiStrategy(lastRoll)
+      checkAiStrategy(lastRoll);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentScore, isAiTurn, isRolling, lastRoll])
+  }, [currentScore, isAiTurn, isRolling, lastRoll]);
 
+
+  // ฟังก์ชัน aiTurn: เริ่มตาการทอยของ AI ในโหมด vsAI
   const aiTurn = () => {
-    setAiRolling(true)
-    setIsRolling(true)
+    if (!gameOver && !hasEnded && !isRollingRef.current) {
+      setAiRolling(true);
+      setIsRolling(true);
+    }
   };
 
+  // ฟังก์ชัน handleAiRollComplete: จัดการผลการทอยของ AI
   const handleAiRollComplete = (roll) => {
-    setAiRolling(false)
-    setIsRolling(false)
-    setLastRoll(roll)
+    setAiRolling(false);
+    setIsRolling(false);
+    setLastRoll(roll);
+    console.log('AI rolled:', roll);
 
     if (roll === 1) {
       try {
-        audio_fail.play()
+        audio_fail.play();
       } catch (e) {
-        console.log('Audio play failed:', e)
+        console.log('Audio play failed:', e);
       }
       setCurrentScore(0);
-      setAiTurnActive(false)
-      setNextRoll(false)
-      setRollOnesCount((prev) => prev + 1)
+      setAiTurnActive(false);
+      setNextRoll(false);
+      setRollOnesCount((prev) => prev + 1);
       setConsecutiveOnes((prev) => {
-        const newConsecutive = [...prev]
-        newConsecutive[1] += 1
-        newConsecutive[0] = 0
-        return newConsecutive
-      })
-
-      if (!gameOver) setCurrentPlayer(0)
+        const newConsecutive = [...prev];
+        newConsecutive[1] += 1;
+        newConsecutive[0] = 0;
+        return newConsecutive;
+      });
+      setBonusTriggered(false);
+      if (!gameOver) setCurrentPlayer(0);
     } else {
       try {
-        audio_success.currentTime = 0
-        audio_success.play()
+        audio_success.currentTime = 0;
+        audio_success.play();
       } catch (e) {
-        console.log('Audio play failed:', e)
+        console.log('Audio play failed:', e);
       }
-      setCurrentScore((prev) => prev + roll)
+      let scoreToAdd = roll;
+      if (roll === 6) {
+        scoreToAdd += 1;
+        setBonusTriggered(true);
+        console.log('AI Bonus triggered: +1 for rolling 6');
+        try {
+          audio_bonus.play();
+        } catch (e) {
+          console.log('Audio play failed for bonus:', e);
+        }
+      } else {
+        setBonusTriggered(false);
+      }
+      setCurrentScore((prev) => {
+        console.log('AI Current score:', prev + scoreToAdd);
+        return prev + scoreToAdd;
+      });
       setConsecutiveOnes((prev) => {
-        const newConsecutive = [...prev]
-        newConsecutive[1] = 0
-        return newConsecutive
+        const newConsecutive = [...prev];
+        newConsecutive[1] = 0;
+        return newConsecutive;
       });
       checkAiStrategy(roll);
     }
   };
 
+  // ฟังก์ชันตัดสินใจ AI
   const checkAiStrategy = (roll) => {
-    if (!isAiTurn || aiRolling) return;
+    if (!isAiTurn || aiRolling || gameOver || hasEnded) return;
 
     if (aiDifficulty === 'easy') {
       if (Math.random() > 0.6 && currentScore > 0) {
@@ -179,11 +263,13 @@ audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
     }
   };
 
+   // ฟังก์ชัน rollDice: จัดการผลการทอยลูกเต๋าสำหรับผู้เล่นและ AI
   const rollDice = (roll) => {
     if (isAiTurn) {
       handleAiRollComplete(roll);
     } else {
       setIsRolling(false);
+      console.log('Player rolled:', roll);
       if (roll === 1) {
         try {
           audio_fail.play();
@@ -195,10 +281,11 @@ audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
         setRollOnesCount((prev) => prev + 1);
         setConsecutiveOnes((prev) => {
           const newConsecutive = [...prev];
-          newConsecutive[currentPlayer] += 1; 
-          newConsecutive[(currentPlayer + 1) % 2] = 0; 
+          newConsecutive[currentPlayer] += 1;
+          newConsecutive[(currentPlayer + 1) % 2] = 0;
           return newConsecutive;
         });
+        setBonusTriggered(false);
       } else {
         try {
           audio_success.currentTime = 0;
@@ -206,16 +293,33 @@ audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
         } catch (e) {
           console.log('Audio play failed:', e);
         }
-        setCurrentScore((prev) => prev + roll)
+        let scoreToAdd = roll;
+        if (roll === 6) {
+          scoreToAdd += 1;
+          setBonusTriggered(true);
+          console.log('Player Bonus triggered: +1 for rolling 6');
+          try {
+            audio_bonus.play();
+          } catch (e) {
+            console.log('Audio play failed for bonus:', e);
+          }
+        } else {
+          setBonusTriggered(false);
+        }
+        setCurrentScore((prev) => {
+          console.log('Player Current score:', prev + scoreToAdd);
+          return prev + scoreToAdd;
+        });
         setConsecutiveOnes((prev) => {
           const newConsecutive = [...prev];
-          newConsecutive[currentPlayer] = 0
+          newConsecutive[currentPlayer] = 0;
           return newConsecutive;
         });
       }
     }
   };
 
+  // ฟังก์ชัน holdScore: เก็บคะแนนชั่วคราวและตรวจสอบผู้ชนะ
   const holdScore = () => {
     if (hasEnded) return;
 
@@ -224,14 +328,15 @@ audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
     newScores[currentPlayer] = newTotalScore;
 
     setScores(newScores);
+    console.log('Holding score:', newTotalScore, 'for player:', currentPlayer);
 
     try {
       audio_success_bank.play();
     } catch (e) {
       console.log('Audio play failed:', e);
     }
-
-    if (newTotalScore >= targetScore && !hasEnded) {
+    // ตรวจสอบว่ามีผู้ชนะหรือไม่ 
+    if (newTotalScore >= targetScore && !hasEnded && gameMode !== 'timed') {
       const winner = newScores[0] >= targetScore ? playerNames[0] : playerNames[1] || 'Unknown Player';
       const duration = Math.floor((Date.now() - startTime) / 1000);
       const gameData = {
@@ -245,11 +350,9 @@ audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
         rollOnesCount,
         playerNames: gameMode === 'vsAI' ? [playerNames[0], `AI (${aiDifficulty})`] : playerNames,
         tournamentRound: gameMode === 'tournament' ? tournamentConfig?.currentRound : undefined,
-        bestOf: gameMode === 'tournament' ? tournamentConfig?.bestOf : undefined, 
+        bestOf: gameMode === 'tournament' ? tournamentConfig?.bestOf : undefined,
         consecutiveOnes,
       };
-
-
 
       if (gameMode === 'tournament') {
         try {
@@ -276,27 +379,50 @@ audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
     setAiRolling(false);
     setAiTurnActive(false);
     setNextRoll(false);
+    setBonusTriggered(false);
 
-    if (!gameOver && newTotalScore < targetScore) {
+    if (!gameOver && (gameMode !== 'timed' || newTotalScore < targetScore)) {
       setCurrentPlayer((prev) => (prev + 1) % 2);
     }
   };
 
+  // ฟังก์ชันรีเซ็ตสถานะสำหรับรอบใหม่ในโหมด tournament
   const handleRoundClose = () => {
-    
-    setScores([0, 0])
-    setCurrentScore(0)
-    setCurrentPlayer(0)
-    setGameOver(false)
-    setHasEnded(false)
-    setStartTime(Date.now())
-    setRollOnesCount(0)
-    setRoundWinner(null)
-     setConsecutiveOnes([0, 0])
+    setScores([0, 0]);
+    setCurrentScore(0);
+    setCurrentPlayer(0);
+    setGameOver(false);
+    setHasEnded(false);
+    setStartTime(Date.now());
+    setRollOnesCount(0);
+    setRoundWinner(null);
+    setConsecutiveOnes([0, 0]);
+    setBonusTriggered(false);
+    setTimeRemaining(timeLimit);
+    setIsRolling(false);
   };
 
   return (
     <div className="p-2 sm:p-4 rounded-lg max-w-3xl mx-auto my-4 sm:my-8">
+      {gameMode === 'timed' && !timerStarted && !gameOver && (
+        <div className="p-4 bg-[#1C2126] rounded-lg shadow-md mb-4 text-center">
+          <button
+            onClick={() => {
+              startTimer();
+              setTimeRemaining(timeLimit);
+              setIsRolling(false); 
+            }}
+            className="bg-[#E1A6E4] text-[#1C2126] font-bold py-2 px-4 rounded hover:bg-[#83FFE7] transition"
+          >
+            Start Timed Game
+          </button>
+        </div>
+      )}
+      {gameMode === 'timed' && timerStarted && !gameOver && (
+        <div className="p-4 bg-[#1C2126] rounded-lg shadow-md mb-4 text-center">
+          <p className="text-[#F5F2F4] text-xl font-mono">Time Remaining: {timeRemaining}s</p>
+        </div>
+      )}
       {gameMode === 'tournament' && !tournamentOver && roundWinner && (
         <RoundWinnerModal
           roundWinner={roundWinner}
@@ -350,14 +476,17 @@ audio_round_win.onerror = () => console.error('Failed to load round_win.mp3');
         playerNames={playerNames}
         currentPlayer={currentPlayer}
       />
-      <Dice
-        rollDice={rollDice}
-        holdScore={holdScore}
-        isAiTurn={isAiTurn}
-        isRolling={isRolling}
-        setIsRolling={setIsRolling}
-        selectedDice={selectedDice}
-      />
+      {gameMode !== 'timed' || timerStarted ? (
+        <Dice
+          rollDice={rollDice}
+          holdScore={holdScore}
+          isAiTurn={isAiTurn}
+          isRolling={isRolling}
+          setIsRolling={setIsRolling}
+          selectedDice={selectedDice}
+          bonusTriggered={bonusTriggered}
+        />
+      ) : null}
     </div>
   );
 }

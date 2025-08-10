@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion'; 
 import React from 'react';
-
+//แสดงคะแนน
 function Scoreboard({ scores, currentScore, playerNames, currentPlayer }) {
   return (
     <div className=" flex justify-center  ">

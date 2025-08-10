@@ -26,7 +26,7 @@ function App() {
  
   // eslint-disable-next-line no-unused-vars
   const [gameKey, setGameKey] = useState(Date.now());
-  const [timeLimit, setTimeLimit] = useState(60);
+  const [timeLimit, setTimeLimit] = useState(parseInt(localStorage.getItem('timeLimit')) || 45);
   const [timerStarted, setTimerStarted] = useState(false);
   const [selectedDice, setSelectedDice] = useState(localStorage.getItem('selectedDice') || 'default');
   const [sounds, setSounds] = useState(() => ({
@@ -37,6 +37,7 @@ function App() {
     roundWin: localStorage.getItem('soundRoundWin') || 'round_win.mp3',
   }));
 
+  //ที่จัดการการโหลดธีม, การฟังการเปลี่ยนแปลงธีมระบบ, และโหลดข้อมูลเกมจาก localStorage
   useEffect(() => { 
     const applyTheme = () => {
         let theme = localStorage.getItem("selectedTheme");
@@ -110,7 +111,17 @@ function App() {
         console.error('Failed to load tournamentOver:', e);
       }
     };
-
+    const loadTimeLimit = () => {
+      try {
+        const savedTimeLimit = localStorage.getItem('timeLimit');
+        if (savedTimeLimit) {
+          setTimeLimit(Number(savedTimeLimit));
+        }
+      } catch (e) {
+        console.error('Failed to load timeLimit:', e);
+      }
+    };
+    loadTimeLimit()
     loadHistory();
     loadConfig();
     loadWins();
@@ -121,6 +132,7 @@ function App() {
     return () => window.removeEventListener('storage', loadHistory);
   }, []);
 
+  //บันทึก gameHistory ลง localStorage
   useEffect(() => {
     if (!isLoaded) return;
     try {
@@ -129,7 +141,7 @@ function App() {
       console.error('Failed to save gameHistory to localStorage:', e);
     }
   }, [gameHistory, isLoaded]);
-
+  //บันทึก tournamentConfig ลง localStorage
   useEffect(() => {
     if (!isLoaded) return;
     try {
@@ -138,7 +150,7 @@ function App() {
       console.error('Failed to save tournamentConfig to localStorage:', e);
     }
   }, [tournamentConfig, isLoaded]);
-
+  //ที่บันทึก tournamentWins ลง localStorage
   useEffect(() => {
     if (!isLoaded) return;
     try {
@@ -157,6 +169,7 @@ function App() {
     }
   }, [tournamentOver, isLoaded]);
 
+  //รีเซ็ตเกมใหม่
   const newGame = () => {
     console.log('newGame called, resetting:', { tournamentOver, tournamentWins, currentRound: tournamentConfig.currentRound });
     setScores([0, 0]);
@@ -173,6 +186,14 @@ function App() {
     localStorage.removeItem('tournamentOver');
   };
 
+
+  const startTimer = () => {
+    if (gameMode === 'timed' && !timerStarted) {
+      setTimerStarted(true);
+    }
+  };
+
+  //จัดการการสิ้นสุดเกม
   const handleGameEnd = (gameData) => {
 
     if (!gameData.winner || !gameData.scores) {
@@ -307,6 +328,7 @@ function App() {
             timeLimit={timeLimit}
             timerStarted={timerStarted}
             setTimerStarted={setTimerStarted}
+            startTimer={startTimer}
             selectedDice={selectedDice}
             sounds={sounds}
           />

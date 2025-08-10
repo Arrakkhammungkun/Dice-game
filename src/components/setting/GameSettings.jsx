@@ -30,7 +30,7 @@ export default React.memo(function GameSettings({
         : 'Easy';
       setNames((prev) => [prev[0] || 'Player 1', `AI [${difficultyName}]`]);
     } else {
-      // รีเซ็ตเป็น Player 1 และ Player 2 สำหรับโหมด 2player หรือ tournament
+     
       setNames((prev) => [prev[0] || 'Player 1', 'Player 2']);
     }
   }, [gameMode, aiDifficulty, setNames]);
@@ -43,7 +43,7 @@ export default React.memo(function GameSettings({
     console.log('BestOf changed:', { newBestOf, currentRound: 1 });
     setTournamentConfig({ ...safeTournamentConfig, bestOf: newBestOf, currentRound: 1 });
   };
-    const handleTimeLimitChange = (e) => {
+  const handleTimeLimitChange = (e) => {
     setTimeLimit(Number(e.target.value));
   };
 
@@ -66,7 +66,7 @@ export default React.memo(function GameSettings({
           <option value="2player">2 Players</option>
           <option value="vsAI">Vs AI</option>
           <option value="tournament">Tournament</option>
-          {/* <option value="timed">Timed</option> */}
+          <option value="timed">Timed</option>
 
         </select>
       </div>

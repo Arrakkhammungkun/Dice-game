@@ -28,23 +28,24 @@ const Navbar = ({
   const [showSettings, setShowSettings] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  //เมื่อกดปุ่มให้โชว์ Model
   const handleNewGameClick = () => {
     setShowModal(true);
    
   };
-  
+  //เมื่อกดปุ่มให้เริ่มเกม
   const confirmNewGame = () => {
     setShowModal(false);
     setIsMenuOpen(false)
     NewGame();
     setView('game')
   };
-
+  //ปุ่มตังค่า
   const handleSettingsClick = () => {
     setShowSettings(true);
     setIsMenuOpen(false); 
   };
-
+  //ปุ่มยกเลิก
   const cancelNewGame = () => {
     setShowModal(false);
   };
@@ -79,7 +80,7 @@ const Navbar = ({
        
         <div className="text-white text-xl sm:text-3xl font-bold ">Dict Game</div>
 
-        {/* Hamburger Icon  */}
+       
         <button
           className="sm:hidden text-white  text-xl focus:outline-none"
           onClick={toggleMenu}
@@ -87,7 +88,7 @@ const Navbar = ({
           <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} />
         </button>
 
-        {/* ปุ่มสำหรับเดสก์ท็อป */}
+       
         <div className="hidden sm:flex items-center  ">
           <button
             onClick={handlePlayClick}

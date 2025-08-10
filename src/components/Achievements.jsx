@@ -71,7 +71,7 @@ const Achievements = ({ gameHistory }) => {
       achievementsData[p1Name].gamesPlayed += 1;
       achievementsData[p2Name].gamesPlayed += 1;
 
-      // Skill Challenge สายโหด
+      // Skill  สายโหด
       if (winner === p1Name && scores[1] === 0) {
         achievementsData[p1Name].shutout = true;
       } else if (winner === p2Name && scores[0] === 0) {
@@ -96,7 +96,7 @@ const Achievements = ({ gameHistory }) => {
         }
       }
 
-      // Skill  Unlucky 
+      // Skill  
       if (game.consecutiveOnes && Array.isArray(game.consecutiveOnes)) {
         const [p1Ones, p2Ones] = game.consecutiveOnes;
         if (p1Ones >= 3) {
@@ -108,7 +108,7 @@ const Achievements = ({ gameHistory }) => {
       }
     });
 
-    // Convert to array for display
+    
     return Object.entries(achievementsData)
       .map(([name, data]) => ({
         name,

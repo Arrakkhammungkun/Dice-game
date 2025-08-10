@@ -9,11 +9,17 @@ const DataManagement = ({ gameHistory, setGameHistory }) => {
   const fileInputRef = useRef(null);
   const [modalType, setModalType] = useState(null);
 
+
+   //แสดง notification ชั่วคราวเพื่อแจ้งผู้ใช้
+
   const showNotification = (message) => {
     setNotification(message);
     setTimeout(() => setNotification(''), 3000);
   };
 
+  
+   // Hook ที่สำรองข้อมูล gameHistory ลง localStorage โดยอัตโนมัติทุกครั้งที่ gameHistory เปลี่ยนแปลง
+   
   useEffect(() => {
     try {
       localStorage.setItem('gameHistoryBackup', JSON.stringify(gameHistory));
@@ -24,6 +30,9 @@ const DataManagement = ({ gameHistory, setGameHistory }) => {
     }
   }, [gameHistory]);
 
+  
+    //ส่งออกสถิติเกมในรูปแบบ JSON โดยคำนวณจาก gameHistory แล้วสร้างไฟล์ให้ดาวน์โหลด
+  
   const exportStatsToJSON = () => {
     const stats = calculateStats();
     const data = JSON.stringify(stats, null, 2);
@@ -37,12 +46,19 @@ const DataManagement = ({ gameHistory, setGameHistory }) => {
     showNotification('Stats exported as JSON');
   };
 
+  
+    //แปลงระยะเวลาในวินาทีให้เป็นรูปแบบนาทีวินาที สำหรับแสดงใน CSV
+
+   
   const formatDuration = (durationInSeconds) => {
     const minutes = Math.floor(durationInSeconds / 60);
     const seconds = String(durationInSeconds % 60).padStart(2, '0');
     return `${minutes}:${seconds} minute`;
   };
 
+  
+   // ส่งออกประวัติเกมในรูปแบบ CSV โดยสร้าง header และ rows จาก gameHistory 
+   
   const exportHistoryToCSV = () => {
     if (gameHistory.length === 0) {
       showNotification('No history to export');
@@ -90,6 +106,10 @@ const DataManagement = ({ gameHistory, setGameHistory }) => {
     showNotification('History exported as CSV');
   };
 
+  
+   // นำเข้าข้อมูลจากไฟล์ JSON ที่อัพโหลด ตรวจสอบความถูกต้อง แล้วอัพเดต gameHistory และ localStorage
+    
+   
   const importData = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -137,6 +157,9 @@ const DataManagement = ({ gameHistory, setGameHistory }) => {
     reader.readAsText(file);
   };
 
+  
+  // แสดง modal เพื่อยืนยันการลบประวัติผู้เล่นก่อนเรียก deletePlayerHistory
+   
   const confirmDeletePlayerHistory = () => {
     if (!playerToDelete.trim()) {
       showNotification('Please enter a player name');
@@ -145,6 +168,9 @@ const DataManagement = ({ gameHistory, setGameHistory }) => {
     setModalType('deleteHistory');
   };
 
+  
+   //ลบประวัติเกมที่เกี่ยวข้องกับผู้เล่นที่ระบุ รวมถึงอัพเดต state และ localStorage
+   
   const deletePlayerHistory = () => {
     const trimmedName = playerToDelete.trim();
     const updatedHistory = gameHistory.filter(
@@ -160,6 +186,9 @@ const DataManagement = ({ gameHistory, setGameHistory }) => {
     setModalType(null);
   };
 
+  
+   //รีเซ็ตข้อมูลทั้งหมด โดยลบ gameHistory จาก state และ localStorage
+   
   const resetAllData = () => {
     setGameHistory([]);
     localStorage.removeItem('gameHistory');
@@ -169,6 +198,9 @@ const DataManagement = ({ gameHistory, setGameHistory }) => {
     showNotification('All data reset, including tournament leaderboard and achievements');
     setModalType(null);
   };
+
+  
+   // คำนวณสถิติเกมทั้งหมดจาก gameHistory 
 
   const calculateStats = () => {
     if (gameHistory.length === 0) {

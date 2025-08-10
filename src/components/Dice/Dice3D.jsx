@@ -1,8 +1,5 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import './Dice3D.css';
-
-
 
 const faceTransform = {
   1: 'rotateX(0deg) rotateY(0deg)',       // front
@@ -13,42 +10,59 @@ const faceTransform = {
   6: 'rotateX(180deg)',                   // back
 };
 
-export default function Dice3D({ isRolling, onRoll , selectedDice }) {
+export default function Dice3D({ isRolling, onRoll, selectedDice }) {
   // eslint-disable-next-line no-unused-vars
   const [value, setValue] = useState(1);
   const diceRef = useRef(null);
+  const isRollingRef = useRef(isRolling);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    isRollingRef.current = isRolling;
+  }, [isRolling]);
 
   useEffect(() => {
     if (isRolling) {
       const newValue = Math.floor(Math.random() * 6) + 1;
-      const audio =new Audio('sounds/dict_sounds.mp3')
-      audio.play()
+      const audio = new Audio('sounds/dict_sounds.mp3');
+      audio.play().catch((e) => console.error('Dice sound failed:', e));
       setValue(newValue);
-       
-      // เริ่มหมุนแบบสุ่มก่อน แล้วค่อยหยุดที่ค่าที่สุ่มได้
+      console.log('Dice3D rolled:', newValue);
+
       const randomX = Math.floor(Math.random() * 12) * 30;
       const randomY = Math.floor(Math.random() * 12) * 30;
       const randomZ = Math.floor(Math.random() * 12) * 30;
 
-      diceRef.current.style.transform = `rotateX(${randomX}deg) rotateY(${randomY}deg) rotateZ(${randomZ}deg)`;
+      if (diceRef.current) {
+        diceRef.current.style.transform = `rotateX(${randomX}deg) rotateY(${randomY}deg) rotateZ(${randomZ}deg)`;
+      }
 
-      // หลังจากนั้นหมุนไปหน้าที่ได้จริง
-      setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
+        if (!isRollingRef.current || !diceRef.current) return;
+
         const dice = diceRef.current;
-        // eslint-disable-next-line no-unused-vars
         let hasFired = false;
         const handleTransitionEnd = () => {
-          hasFired = true;
-          onRoll?.(newValue); 
-          dice.removeEventListener('transitionend', handleTransitionEnd);
+          if (!hasFired && isRollingRef.current) {
+            hasFired = true;
+            console.log('Triggering onRoll with value:', newValue);
+            onRoll?.(newValue);
+            dice.removeEventListener('transitionend', handleTransitionEnd);
+          }
         };
 
         dice.addEventListener('transitionend', handleTransitionEnd);
         dice.style.transform = faceTransform[newValue];
       }, 1000);
 
+      return () => {
+        if (diceRef.current) {
+          diceRef.current.removeEventListener('transitionend', () => {});
+        }
+        clearTimeout(timeoutRef.current);
+      };
     }
-  }, [isRolling, onRoll]);
+  }, [isRolling]);
 
   return (
     <div className={`dice-container dice-${selectedDice || 'default'}`}>

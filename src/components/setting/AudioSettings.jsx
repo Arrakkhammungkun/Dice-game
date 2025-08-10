@@ -11,7 +11,7 @@ const availableSounds = [
 
 const Roll_Success = ["success.mp3", "score1.mp3", "score2.mp3","success_bank.mp3",];
 const Win = ["Win2.mp3", "Win3.mp3", "win.mp3"];
-const _soundsfail = ["fail1.mp3", "fail2.mp3"];
+const _soundsfail = ["fail1.mp3", "fail2.mp3","fail.mp3",];
 const Score_Sound = ["level_1.mp3", "levelup_2.mp3", "levelup_3.mp3"];
 
 const AudioSettings = ({ sounds, setSounds }) => {
