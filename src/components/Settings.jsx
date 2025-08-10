@@ -29,8 +29,8 @@ const Settings = ({
   const [localTournamentConfig, setLocalTournamentConfig] = useState(
     tournamentConfig || { bestOf: 3, currentRound: 1 }
   );
-  const [selectedTheme, setSelectedTheme] = useState(localStorage.getItem('selectedTheme') || 'light');
-  const [temporarySelectedTheme, setTemporarySelectedTheme] = useState(selectedTheme); // เพิ่ม state ชั่วคราวสำหรับ theme
+  const [selectedTheme, setSelectedTheme] = useState(localStorage.getItem('selectedTheme') || 'dark');
+  const [temporarySelectedTheme, setTemporarySelectedTheme] = useState(selectedTheme); 
   const [temporarySelectedDice, setTemporarySelectedDice] = useState(selectedDice);
   const [temporarySounds, setTemporarySounds] = useState(sounds);
 
