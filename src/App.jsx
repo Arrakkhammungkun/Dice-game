@@ -41,7 +41,7 @@ function App() {
     const applyTheme = () => {
         let theme = localStorage.getItem("selectedTheme");
         if (!theme) {
-          theme = "colorful"; 
+          theme = "dark"; 
         }
         if (theme === "system") {
           const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
